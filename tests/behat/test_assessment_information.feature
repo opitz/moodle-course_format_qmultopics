@@ -10,7 +10,7 @@ Feature: The Assessment Information block will be shown as a tab
       | teacher1 | Teacher   | 1        | teacher1@example.com |
     And the following "courses" exist:
       | fullname | shortname | format | coursedisplay | numsections |
-      | Course 1 | C1        | qmulopics | 0             | 5           |
+      | Course 1 | C1        | qmultopics | 0             | 5           |
     And the following "activities" exist:
       | activity   | name                   | intro                         | course | idnumber    | section |
       | assign     | Test assignment name   | Test assignment description   | C1     | assign1     | 0       |
