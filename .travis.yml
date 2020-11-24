@@ -57,6 +57,8 @@ before_install:
 
 # This lists steps that are run for installation and setup.
 install:
+  # Adc additional plugin
+  - moodle-plugin-ci add-plugin opitz/moodle-format_topics2
   # Run the default install.  The overview of what this does:
   #    - Clone the Moodle project into a directory called moodle.
   #    - Create a data directory called moodledata.
