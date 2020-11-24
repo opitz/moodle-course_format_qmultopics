@@ -41,7 +41,7 @@ env:
 # (git://github.com/moodle/moodle.git is used by default):
 #  - MOODLE_REPO=git://github.com/opitz/qmplus.git
 #  - MOODLE_REPO=https://github.com/opitz/qmplus.git
-  - MOODLE_REPO=git://github.com/opitz/moodle.git
+#  - MOODLE_REPO=git://github.com/opitz/moodle.git
 
 # This lists steps that are run before the installation step.
 before_install:
