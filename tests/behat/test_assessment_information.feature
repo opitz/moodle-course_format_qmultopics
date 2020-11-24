@@ -29,4 +29,3 @@ Feature: The Assessment Information block will be shown as a tab
     Then I should see "Assessment Information"
     And I click on element "#tab_assessment_info_block"
     Then the assignment information area should be visible
-
