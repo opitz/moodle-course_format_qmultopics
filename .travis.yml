@@ -22,9 +22,9 @@ cache:
 # listed here will create a separate build and run the tests against that
 # version of PHP.
 php:
-  #  - 7.2
+  - 7.2
   #  - 7.3
-  - 7.4
+  #- 7.4
 
 # This section sets up the environment variables for the build.
 env:
