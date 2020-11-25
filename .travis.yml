@@ -30,9 +30,9 @@ php:
 env:
   global:
     #    - MOODLE_BRANCH=MOODLE_38_STABLE
-  #  - MOODLE_BRANCH=MOODLE_39_STABLE
+  - MOODLE_BRANCH=MOODLE_39_STABLE
   #    - MOODLE_BRANCH=MOODLE_310_STABLE
-  - MOODLE_BRANCH=master
+  #- MOODLE_BRANCH=master
   matrix:
     #    - DB=pgsql
     - DB=mysqli
@@ -59,6 +59,8 @@ before_install:
 install:
   # Adc additional plugin
   - moodle-plugin-ci add-plugin opitz/moodle-format_topics2
+  - moodle-plugin-ci add-plugin opitz/moodle-block_assessment_information
+
   # Run the default install.  The overview of what this does:
   #    - Clone the Moodle project into a directory called moodle.
   #    - Create a data directory called moodledata.
