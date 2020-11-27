@@ -42,4 +42,3 @@ Feature: See various assessment badges
     And I am on "Course 1" course homepage
     Then I should see "Due 27 December 2020"
 #    And I should see "0 of 1 Attempted"
-  
