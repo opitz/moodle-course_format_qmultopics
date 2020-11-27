@@ -21,7 +21,7 @@ Feature: See various assessment badges
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
     And I log in as "student"
-    And I am on "C1" course homepage
+    And I am on "Course 1" course homepage
   @javascript
   Scenario: See a badge with a time limit
     Given the following "activities" exist:
