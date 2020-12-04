@@ -22,12 +22,14 @@ Feature: See various assessment badges
     And the following "questions" exist:
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
+      | Test questions   | truefalse   | TF2   | Second question |
     And the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | timeclose  | section |
       | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1609063560 | 1       |
     And quiz "Quiz 1" contains the following questions:
-      | question | page |
-      | TF1      | 1    |
+      | question | page | maxmark |
+      | TF1      | 1    |         |
+      | TF2      | 1    | 3.0     |
 
   @javascript
   Scenario: As a student see a badge with a time limit and a badge with no attempt
@@ -42,3 +44,15 @@ Feature: See various assessment badges
     And I am on "Course 1" course homepage
     Then I should see "Due 27 December 2020"
 #    And I should see "0 of 1 Attempted"
+
+  @javascript
+  Scenario: As a student after having attempted a quiz I should see a badge telling me so
+    Given user "student" has attempted "Quiz 1" with responses:
+      | slot | response |
+      |   1  | True     |
+      |   2  | False    |
+    When I log in as "student"
+    And I am on "Course 1" course homepage
+    Then I should see "Due 27 December 2020"
+    And I should see "Not attempted"
+
