@@ -55,4 +55,3 @@ Feature: See various assessment badges
     And I am on "Course 1" course homepage
     Then I should see "Due 31 December 2025"
     And I should see "Finished"
-    
