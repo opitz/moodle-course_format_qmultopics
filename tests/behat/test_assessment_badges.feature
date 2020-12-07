@@ -25,7 +25,7 @@ Feature: See various assessment badges
       | Test questions   | truefalse   | TF2   | Second question |
     And the following "activities" exist:
       | activity   | name   | intro              | course | idnumber | timeclose  | section |
-      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1609063560 | 1       |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1767139200 | 1       |
     And quiz "Quiz 1" contains the following questions:
       | question | page | maxmark |
       | TF1      | 1    |         |
@@ -35,14 +35,14 @@ Feature: See various assessment badges
   Scenario: As a student see a badge with a time limit and a badge with no attempt
     When I log in as "student"
     And I am on "Course 1" course homepage
-    Then I should see "Due 27 December 2020"
+    Then I should see "Due 31 December 2025"
     And I should see "Not attempted"
 
   @javascript
   Scenario: As a teacher see a badge with a time limit and a badge with no attempt
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    Then I should see "Due 27 December 2020"
+    Then I should see "Due 31 December 2025"
 #    And I should see "0 of 1 Attempted"
 
   @javascript
@@ -53,6 +53,6 @@ Feature: See various assessment badges
       |   2  | False    |
     When I log in as "student"
     And I am on "Course 1" course homepage
-    Then I should see "Due 27 December 2020"
+    Then I should see "Due 31 December 2025"
     And I should see "Not attempted"
 
