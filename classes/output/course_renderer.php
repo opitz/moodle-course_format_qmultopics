@@ -186,6 +186,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_due_date_badge($duedate) {
+        // If duedate is 0 don't show a badge.
+        if ($duedate == 0) {
+            return '';
+        }
         $dateformat = "%d %B %Y";
         $badgeclass = '';
         $duetext = get_string('badge_due', 'format_qmultopics');
