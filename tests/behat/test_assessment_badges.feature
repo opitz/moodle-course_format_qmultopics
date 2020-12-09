@@ -23,9 +23,6 @@ Feature: See various assessment badges
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
       | Test questions   | truefalse   | TF2   | Second question |
-    And the following "activities" exist:
-      | activity   | name   | intro              | course | idnumber | timeclose  | section |
-      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1767139200 | 1       |
     And quiz "Quiz 1" contains the following questions:
       | question | page | maxmark |
       | TF1      | 1    |         |
@@ -33,6 +30,9 @@ Feature: See various assessment badges
 
   @javascript
   Scenario: As a student see a badge with a time limit and a badge with no attempt
+    Given the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | timeclose  | section |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1767139200 | 1       |
     When I log in as "student"
     And I am on "Course 1" course homepage
     Then I should see "Due 31 December 2025"
@@ -40,6 +40,9 @@ Feature: See various assessment badges
 
   @javascript
   Scenario: As a teacher see a badge with a time limit and a badge with no attempt
+    Given the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | timeclose  | section |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1767139200 | 1       |
     When I log in as "teacher"
     And I am on "Course 1" course homepage
     Then I should see "Due 31 December 2025"
@@ -47,7 +50,10 @@ Feature: See various assessment badges
 
   @javascript
   Scenario: As a student after having attempted a quiz I should see a badge telling me so
-    Given user "student" has attempted "Quiz 1" with responses:
+    Given the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | timeclose  | section |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 1767139200 | 1       |
+    And user "student" has attempted "Quiz 1" with responses:
       | slot | response |
       |   1  | True     |
       |   2  | False    |
@@ -55,3 +61,12 @@ Feature: See various assessment badges
     And I am on "Course 1" course homepage
     Then I should see "Due 31 December 2025"
     And I should see "Finished"
+
+  @javascript
+  Scenario: As a teacher I should see no due date badge when no due date is set
+    Given the following "activities" exist:
+      | activity   | name   | intro              | course | idnumber | timeclose  | section |
+      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 0          | 1       |
+    When I log in as "teacher"
+    And I am on "Course 1" course homepage
+    Then I should not see "Due"
