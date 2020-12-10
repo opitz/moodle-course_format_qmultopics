@@ -81,4 +81,4 @@ Feature: See various assessment badges
       | TF2      | 1    | 3.0     |
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    Then I should not see "Was due"
+    Then I should see "Was due"
