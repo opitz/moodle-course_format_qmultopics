@@ -73,12 +73,8 @@ Feature: See various assessment badges
   @javascript
   Scenario: As a teacher I should see no due date badge when no due date is set
     Given the following "activities" exist:
-      | activity   | name   | intro              | course | idnumber | timeclose  | section |
-      | quiz       | Quiz 1 | Quiz 1 description | C1     | quiz1    | 0          | 1       |
-    And quiz "Quiz 1" contains the following questions:
-      | question | page | maxmark |
-      | TF1      | 1    |         |
-      | TF2      | 1    | 3.0     |
+      | activity  | course  | idnumber  | name              | intro             |
+      | assign    | C1      | assign1   | Test Assignment 1 | Test Assignment 1 |
     When I log in as "teacher"
     And I am on "Course 1" course homepage
-    Then I should see "Was due"
+    Then I should not see "Was due"
