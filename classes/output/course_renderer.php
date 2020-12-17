@@ -402,20 +402,21 @@ class qmultopics_course_renderer extends \core_course_renderer{
             // Go through the group_data to get numbers for groups, submissions and gradings.
             $coursegroupsarray = [];
             $groupsubmissionsarray = [];
+            $groupgradingsarray = [];
             if (isset($COURSE->group_assign_data)) {
                 foreach ($COURSE->group_assign_data as $record) {
                     $coursegroupsarray[$record->groupid] = $record->groupid;
-                    if ($record->grade < 0) {
+                    if ($record->assignment == $mod->instance && !$record->grade > 0) {
                         $groupsubmissionsarray[$record->groupid] = true;
-                    } else if ($record->grade > 0) {
+                    } else if ($record->assignment == $mod->instance && $record->grade > 0) {
                         $groupsubmissionsarray[$record->groupid] = true;
-                        $coursegroupsarray[$record->groupid] = $record->grade;
+                        $groupgradingsarray[$record->groupid] = $record->grade;
                     }
                 }
             }
             $coursegroups = count($coursegroupsarray);
             $groupsubmissions = count($groupsubmissionsarray);
-            $groupgradings = count($coursegroupsarray);
+            $groupgradings = count($groupgradingsarray);
             $ungraded = $groupsubmissions - $groupgradings;
             $badgetext = $pretext
                 .$groupsubmissions

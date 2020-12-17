@@ -60,6 +60,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             // Create an object that contains data about modules used in this course.
             $COURSE->module_data = $this->get_module_data();
             $COURSE->group_assign_data = $this->get_group_assign_data();
+            $top = true;
         }
     }
 
@@ -69,7 +70,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * @return array
      * @throws dml_exception
      */
-    public function get_module_data() {
+    protected function get_module_data() {
         global $COURSE, $DB;
         $sql = "
             select concat_ws('', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id) as row_id
@@ -153,7 +154,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * @return array
      * @throws dml_exception
      */
-    public function get_group_assign_data() {
+    protected function get_group_assign_data0() {
         global $COURSE, $DB;
         $sql = "
             SELECT
@@ -168,6 +169,25 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
             where asu.groupid > 0
             and a.course = $COURSE->id
+";
+        return $DB->get_records_sql($sql);
+    }
+    protected function get_group_assign_data() {
+        global $COURSE, $DB;
+        $sql = "
+            select
+            gm.id as ID
+            ,gm.groupid
+            ,gm.userid
+            ,asu.assignment
+            ,ag.grade
+            from {groups} g
+            left join {groups_members} gm on gm.groupid = g.id
+            left join {assign_submission} asu on asu.groupid = g.id
+            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
+            where 1
+            and g.courseid = $COURSE->id
+
 ";
         return $DB->get_records_sql($sql);
     }
