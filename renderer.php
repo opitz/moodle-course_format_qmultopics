@@ -267,9 +267,9 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             ,ag.grade
             from {groups} g
             join {groups_members} gm on gm.groupid = g.id
-            left join {assign_submission} asu on asu.groupid = g.id and asu.userid = gm.userid
+            left join {assign_submission} asu on asu.groupid = g.id
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
-            where g.courseid = $COURSE->id";
+            where g.courseid = $COURSE->id and asu.userid = 0";
         return $DB->get_records_sql($sql);
     }
 
