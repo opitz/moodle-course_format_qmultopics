@@ -224,9 +224,8 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             #and m.name = 'choice'
             #order by m.name
             #order by concat_ws('',cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id)
-            limit 5000
+            #limit 5000
         ";
-//        return array();
         return $DB->get_records_sql($sql);
     }
 
