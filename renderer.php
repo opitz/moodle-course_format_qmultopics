@@ -53,18 +53,17 @@ class format_qmultopics_renderer extends format_topics2_renderer {
         parent::__construct($page, $target);
         $this->courseformat = course_get_format($page->course);
         $this->tcsettings = $this->courseformat->get_format_options();
-        // Let's use our own course renderer as we want to add badges to the module output.
-        // But only if there are less that 1000 students enrolled into the course.
+        // If theme badges are not enabled let's use our own course renderer as we want to add badges to the module output.
         $usethemebadges = get_config('format_qmultopics', 'usethemebadges');
         if ($usethemebadges != 1) {
             $newcourserenderer = new qmultopics_course_renderer($page, null);
-            $this->courserenderer = $newcourserenderer;
-            // Create objects that contain data about modules and groups used in this course.
-            $COURSE->module_data = $this->get_module_data();
-            $COURSE->group_assign_data = $this->get_group_assign_data();
-//            $students = count($newcourserenderer->enrolled_users(""));
-//            if (count($newcourserenderer->enrolled_users("")) < 1000) {
-//            }
+            // But only if there are less that 1000 students enrolled into the course.
+            if (count($newcourserenderer->enrolled_users("")) < 1000) {
+                $this->courserenderer = $newcourserenderer;
+                // Create objects that contain data about modules and groups used in this course.
+                $COURSE->module_data = $this->get_module_data();
+                $COURSE->group_assign_data = $this->get_group_assign_data();
+            }
         }
     }
 
@@ -225,7 +224,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             #and m.name = 'choice'
             #order by m.name
             #order by concat_ws('',cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id)
-            limit 10000
+            limit 5000
         ";
 //        return array();
         return $DB->get_records_sql($sql);
