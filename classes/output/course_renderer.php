@@ -498,10 +498,32 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     && $module->assign_id == $mod->instance
                     && $module->assign_userid == $USER->id
                     && $module->assign_grade > 0
+//                    && ($module->gi_hidden == 0 || ($module->gi_hidden > 1 && $module->gi_hidden < time()))
+//                    && ($module->gg_hidden == 0 || ($module->gg_hidden > 1 && $module->gg_hidden < time()))
+//                    && $module->gi_locked == 0
+//                    && $module->gg_locked == 0
+                ) {
+                    $grading[] = $module;
+                }
+            }
+        }
+        return $grading;
+    }
+    public function get_grading1($mod) {
+        global $COURSE, $USER;
+
+        $grading = [];
+        if (isset($COURSE->module_data)) {
+            foreach ($COURSE->module_data as $module) {
+                if ($module->module_name == 'assign'
+                    && $module->assign_id == $mod->instance
+                    && $module->assign_userid == $USER->id
+                    && $module->assign_grade > 0
                     && ($module->gi_hidden == 0 || ($module->gi_hidden > 1 && $module->gi_hidden < time()))
                     && ($module->gg_hidden == 0 || ($module->gg_hidden > 1 && $module->gg_hidden < time()))
                     && $module->gi_locked == 0
-                    && $module->gg_locked == 0) {
+                    && $module->gg_locked == 0
+                ) {
                     $grading[] = $module;
                 }
             }
