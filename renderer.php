@@ -76,8 +76,12 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     protected function get_module_data() {
         global $COURSE, $DB;
         $sql = "
-            select concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id) as row_id
+            select concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id,gi.id,gg.id) as row_id
             ,m.name as module_name
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
             #,'assign >'
             ,a.id as assign_id
             ,a.name as assign
@@ -124,6 +128,8 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             ,qg.grade as quiz_grade
             from {course_modules} cm
             join {modules} m on m.id = cm.module
+            left join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            left join {grade_grades} gg on gg.itemid = gi.id
             # assign
             left join {assign} a on a.id = cm.instance and a.course = cm.course and m.name = 'assign'
             left join {assign_submission} asu on asu.assignment = a.id
@@ -142,6 +148,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             left join {quiz} q on q.id = cm.instance and q.course = cm.course and m.name = 'quiz'
             left join {quiz_attempts} qa on qa.quiz = q.id
             left join {quiz_grades} qg on qg.quiz = qa.quiz and qg.userid = qa.userid
+            
             where 1
             and cm.course = $COURSE->id
             #and m.name = 'choice'
