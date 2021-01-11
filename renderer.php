@@ -80,10 +80,10 @@ class format_qmultopics_renderer extends format_topics2_renderer {
 #            concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id,gi.id,gg.id) as row_id
             concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id,gi.id) as row_id
             ,m.name as module_name
-#            ,gi.hidden as gi_hidden
-#            ,gi.locked as gi_locked
-#            ,gg.hidden as gg_hidden
-#            ,gg.locked as gg_locked
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
             #,'assign >'
             ,a.id as assign_id
             ,a.name as assign
