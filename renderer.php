@@ -76,8 +76,9 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     protected function get_module_data() {
         global $COURSE, $DB;
         $sql = "
-            select 
-            concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id, l.id,la.id,lg.id,q.id,qa.id,qg.id,gi.id,gg.id) as row_id
+            select
+            concat_ws('_', cm.id,a.id, asu.id, ag.id, c.id, ca.id, f.id, fc.id,
+                l.id,la.id,lg.id,q.id,qa.id,qg.id,gi.id,gg.id) as row_id
             ,m.name as module_name
             ,gi.hidden as gi_hidden
             ,gi.locked as gi_locked
@@ -186,7 +187,8 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             left join {assign_submission} asu on asu.groupid = g.id
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
             # grading
-            left join {grade_items} gi on (gi.courseid = g.courseid and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
+            left join {grade_items} gi on (gi.courseid = g.courseid 
+                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
             left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
             where g.courseid = $COURSE->id and asu.userid = 0";
         return $DB->get_records_sql($sql);
