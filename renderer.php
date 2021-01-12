@@ -187,7 +187,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             left join {assign_submission} asu on asu.groupid = g.id
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
             # grading
-            left join {grade_items} gi on (gi.courseid = g.courseid 
+            left join {grade_items} gi on (gi.courseid = g.courseid
                 and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
             left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
             where g.courseid = $COURSE->id and asu.userid = 0";
