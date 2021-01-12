@@ -509,27 +509,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
         return $grading;
     }
-    public function get_grading1($mod) {
-        global $COURSE, $USER;
-
-        $grading = [];
-        if (isset($COURSE->module_data)) {
-            foreach ($COURSE->module_data as $module) {
-                if ($module->module_name == 'assign'
-                    && $module->assign_id == $mod->instance
-                    && $module->assign_userid == $USER->id
-                    && $module->assign_grade > 0
-                    && ($module->gi_hidden == 0 || ($module->gi_hidden > 1 && $module->gi_hidden < time()))
-                    && ($module->gg_hidden == 0 || ($module->gg_hidden > 1 && $module->gg_hidden < time()))
-                    && $module->gi_locked == 0
-                    && $module->gg_locked == 0
-                ) {
-                    $grading[] = $module;
-                }
-            }
-        }
-        return $grading;
-    }
 
     /**
      * Return true if the submission of the group of which the given student is a member has already been graded
@@ -544,7 +523,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
             return false;
         }
         foreach ($COURSE->group_assign_data as $record) {
-            if ($record->assignment == $mod->instance && $record->userid == $USER->id && $record->grade > 0) {
+            if ($record->assignment == $mod->instance
+                && $record->userid == $USER->id
+                && $record->grade > 0
+                && ($record->gi_hidden == 0 || ($record->gi_hidden > 1 && $record->gi_hidden < time()))
+                && ($record->gg_hidden == 0 || ($record->gg_hidden > 1 && $record->gg_hidden < time()))
+                && $record->gi_locked == 0
+                && $record->gg_locked == 0
+            ) {
                 return true;
             }
         }
