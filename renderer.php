@@ -193,23 +193,6 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             where g.courseid = $COURSE->id and asu.userid = 0";
         return $DB->get_records_sql($sql);
     }
-    protected function get_group_assign_data0() {
-        global $COURSE, $DB;
-        $sql = "
-            select
-             g.id
-            , gm.id as ID
-            , gm.groupid
-            , gm.userid
-            , asu.assignment
-            ,ag.grade
-            from {groups} g
-            join {groups_members} gm on gm.groupid = g.id
-            left join {assign_submission} asu on asu.groupid = g.id
-            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
-            where g.courseid = $COURSE->id and asu.userid = 0";
-        return $DB->get_records_sql($sql);
-    }
 
     /**
      * Require the jQuery files for this class
@@ -385,33 +368,6 @@ class format_qmultopics_renderer extends format_topics2_renderer {
         }
 
         return $tabs;
-    }
-
-    /**
-     * check and add the assessment information
-     * @param array|stdClass $course
-     * @return bool|int
-     * @throws dml_exception
-     */
-    public function add_assessment_information_block($course) {
-        global $DB;
-        // Get block context for the course.
-        $context = $DB->get_record('context', array('instanceid' => $course->id, 'contextlevel' => '50'));
-
-        // Install the Assessment Information block.
-        $airecord = new stdClass();
-        $airecord->blockname = 'assessment_information';
-        $airecord->parentcontextid = $context->id;
-        $airecord->showinsubcontexts = 0;
-        $airecord->requiredbytheme = 0;
-        $airecord->pagetypepattern = 'course-view-*';
-        $airecord->defaultregion = 'side-pre';
-        $airecord->defaultweight = -5;
-        $airecord->configdata = '';
-        $airecord->timecreated = time();
-        $airecord->timemodified = time();
-
-        return $DB->insert_record('block_instances', $airecord);
     }
 
     /**
