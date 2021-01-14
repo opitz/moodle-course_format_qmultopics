@@ -488,10 +488,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return array
      */
-    public function get_grading($mod) {
+    protected function get_grading($mod) {
         global $COURSE, $USER;
 
-        $grading = [];
         if (isset($COURSE->module_data)) {
             foreach ($COURSE->module_data as $module) {
                 if ($module->module_name == 'assign'
@@ -503,11 +502,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     && $module->gi_locked == 0
                     && $module->gg_locked == 0
                 ) {
-                    $grading[] = $module;
+                    return true;
                 }
             }
         }
-        return $grading;
+        return false;
     }
 
     /**
@@ -516,7 +515,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return bool
      */
-    public function get_group_grading($mod) {
+    protected function get_group_grading($mod) {
         global $COURSE, $USER;
 
         if (!isset($COURSE->group_assign_data)) {
