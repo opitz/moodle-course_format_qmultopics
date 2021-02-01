@@ -49,7 +49,7 @@ class behat_format_qmultopics extends behat_base {
      * @param string $selector
      * @throws Exception
      */
-    public function i_clicko_on_element($selector) {
+    protected function i_clicko_on_element($selector) {
         $page = $this->getSession()->getPage();
         $element = $page->find('css', $selector);
 
@@ -66,7 +66,7 @@ class behat_format_qmultopics extends behat_base {
      * @Given /^the assignment information area should be visible$/
      * @throws ElementNotFoundException
      */
-    public function the_assignment_information_area_should_be_visible() {
+    protected function the_assignment_information_area_should_be_visible() {
         $sectionxpath = "//div[@id='assessment_information_area']";
         $xpath = "//div[@id='assessment_information_area'][not(contains(@class, 'hidden'))]";
 
