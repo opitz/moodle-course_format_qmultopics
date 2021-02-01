@@ -43,30 +43,12 @@ class behat_format_qmultopics extends behat_base {
 
 
     /**
-     * Click in the given DOM element
-     *
-     * @Given /^I clicko on element "([^"]*)"$/
-     * @param string $selector
-     * @throws Exception
-     */
-    protected function i_clicko_on_element($selector) {
-        $page = $this->getSession()->getPage();
-        $element = $page->find('css', $selector);
-
-        if (empty($element)) {
-            throw new Exception("No html element found for the selector ('$selector')");
-        }
-
-        $element->click();
-    }
-
-    /**
      * Checking if the Assessment Information area is visible.
      *
      * @Given /^the assignment information area should be visible$/
      * @throws ElementNotFoundException
      */
-    protected function the_assignment_information_area_should_be_visible() {
+    public function the_assignment_information_area_should_be_visible() {
         $sectionxpath = "//div[@id='assessment_information_area']";
         $xpath = "//div[@id='assessment_information_area'][not(contains(@class, 'hidden'))]";
 
