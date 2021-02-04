@@ -308,20 +308,23 @@ define(['jquery', 'jqueryui'], function($) {
 
                 if (tabid === 'tab0') { // Show all sections - then hide each section shown in other tabs
                     $("#changenumsections").show();
-                    $("li.section").show();
+//                    $("li.section").show();
+                    $("li.section").removeClass('hidden').show();
                     $(".topictab:visible").each(function() {
                         if ($(this).attr('sections').length > 0) {
                             // If any split sections into an array, loop through it and hide section with the found ID
                             $.each($(this).attr('sections').split(","), function(index, value) {
                                 var target = $(".section[section-id='" + value + "']");
-                                target.hide();
+//                                target.hide();
+                                target.addClass('hidden').hide();
                                 console.log("--> hiding section " + value);
                             });
                         }
                     });
                 } else if (tabid === 'tab_assessment_information') { // Show the Assessment Information as new tab
 //                    console.log('Assessment Info tab clicked!');
-                    $("li.section").hide();
+//                    $("li.section").hide();
+                    $("li.section").addClass('hidden').hide();
                     $("li.section.hidden").addClass("hiding");
                     $("li.section.hiding").removeClass("hidden");
 
@@ -333,17 +336,8 @@ define(['jquery', 'jqueryui'], function($) {
                     }
                 } else if (tabid === 'tab_assessment_info_block') { // Show the Assessment Info Block on the main stage
 //                    console.log('Assessment Info Block tab clicked!');
-
-                    // Here comes a bit of hacking in course of replacing the old Assessment Information with the new one
-                    // provided by the Assessment Information block
-                    // If the new Assessment Information block has just been installed to replace the deprecated Synergy variant
-                    // the tab is rendered but the block has not been recognised yet as it was not there when
-                    // the loading of this page begun - in this case we just reload the page again
-//                    if ($('.block_assessment_information').length < 1) {
-//                        window.location = window.location;
-//                    }
-
-                    $("li.section").hide();
+//                    $("li.section").hide();
+                    $("li.section").addClass('hidden').hide();
                     $("#changenumsections").hide();
                     $("li.section.hidden").addClass("hiding");
                     $("li.section.hiding").removeClass("hidden");
@@ -353,19 +347,23 @@ define(['jquery', 'jqueryui'], function($) {
                     $('#assessment_information_area').show();
                 } else { // Hide all sections - then show those found in sectionArray
                     $("#changenumsections").show();
-                    $("li.section").hide();
+//                    $("li.section").hide();
+                    $("li.section").addClass('hidden').hide();
                     $.each(sectionArray, function(index, value) {
                         var target = $(".section[section-id='" + value + "']");
-                        target.show();
+//                        target.show();
+                        target.removeClass('hidden').show();
                         console.log("--> showing section " + value);
                     });
                 }
 
                 // Show section-0 always when it should be shown always
-                $('#ontop_area #section-0').show();
+//                $('#ontop_area #section-0').show();
+                $('#ontop_area #section-0').removeClass('hidden').show();
 
                 var visibleSections = $('li.section:visible').length;
-                var hiddenSections = $('li.section.hidden:visible').length;
+//                var hiddenSections = $('li.section.hidden:visible').length;
+                var hiddenSections = $('li.section:visible').find('.ishidden').length;
                 var visibleBlocks = $('#modulecontent').find('.block:visible');
                 var visibleAssessmentInfo = $('#content_assessmentinformation_area:visible').length;
 
@@ -611,7 +609,8 @@ define(['jquery', 'jqueryui'], function($) {
                 $(".section-actions .menubar .action-menu-trigger .dropdown .dropdown-menu .dropdown-item").on('click', function() {
                     var activeTab = $('.tablink.active');
                     var visibleSections = $('li.section:visible').length;
-                    var hiddenSections = $('li.section.hidden:visible').length;
+//                    var hiddenSections = $('li.section.hidden:visible').length;
+                    var hiddenSections = $('li.section:visible').find('.ishidden').length;
                     var visibleBlocks = $('#modulecontent').find('.block:visible');
                     var visibleAssessmentInfo = $('#content_assessmentinformation_area:visible').length;
 
