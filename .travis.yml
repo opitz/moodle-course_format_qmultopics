@@ -57,6 +57,10 @@ before_install:
 
 # This lists steps that are run for installation and setup.
 install:
+  # Install required plugins
+  - moodle-plugin-ci add-plugin opitz/moodle-format_topics2
+  - moodle-plugin-ci add-plugin opitz/moodle-block_assessment_information
+
   # Run the default install.  The overview of what this does:
   #    - Clone the Moodle project into a directory called moodle.
   #    - Create a data directory called moodledata.
@@ -68,9 +72,6 @@ install:
   #    - If your plugin has Behat features, then Behat will be setup.
   #    - If your plugin has unit tests, then PHPUnit will be setup.
   - moodle-plugin-ci install
-
-  - moodle-plugin-ci add-plugin opitz/moodle-format_topics2
-  - moodle-plugin-ci add-plugin opitz/moodle-block_assessment_information
 
 # This lists steps that are run for the purposes of testing.  Any of
 # these steps can be re-ordered or removed to your liking.  And of
