@@ -211,8 +211,6 @@ class format_qmultopics extends format_topics2 {
                     'help' => 'coursedisplay',
                     'help_component' => 'moodle',
                 ),
-
-
                 'defaultcollapse' => array(
                     'label' => get_string('defaultcollapse', 'format_qmultopics'),
                     'element_type' => 'select',
@@ -225,12 +223,6 @@ class format_qmultopics extends format_topics2 {
                     'help' => 'defaultcollapse',
                     'help_component' => 'format_qmultopics',
                 ),
-
-
-
-
-
-
                 'section0_ontop' => array(
                     'label' => get_string('section0_label', 'format_topics2'),
                     'element_type' => 'advcheckbox',
