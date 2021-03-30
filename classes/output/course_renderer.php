@@ -458,7 +458,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $submission = false;
         foreach ($COURSE->module_data as $module) {
-            if ($module->module_name == 'assign' && $module->assign_userid == $USER->id && $module->assign_id == $mod->instance) {
+            if ($module->module_name == 'assign' &&
+                $module->assign_userid == $USER->id &&
+                $module->assign_id == $mod->instance &&
+                $module->assign_submission_status == 'submitted') {
                 $submission = $module;
                 break;
             }
