@@ -140,7 +140,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= $this->show_badges($mod);
             $output .= html_writer::end_div();
         }
-        
+
         $output .= html_writer::end_tag('div');
 
         // End of indentation div.
