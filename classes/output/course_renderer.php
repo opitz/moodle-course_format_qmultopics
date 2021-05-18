@@ -134,11 +134,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= $contentpart;
         }
 
-        // Amending badges.
-        $output .= html_writer::start_div();
-        $output .= $this->show_badges($mod);
-        $output .= html_writer::end_div();
-
+        // Amending badges - but for courses with < 1000 students only
+        if (count($this->enrolled_users('')) < 1000) {
+            $output .= html_writer::start_div();
+            $output .= $this->show_badges($mod);
+            $output .= html_writer::end_div();
+        }
+        
         $output .= html_writer::end_tag('div');
 
         // End of indentation div.
