@@ -408,11 +408,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
             if (isset($COURSE->group_assign_data)) {
                 foreach ($COURSE->group_assign_data as $record) {
                     $coursegroupsarray[$record->groupid] = $record->groupid;
-                    if ($record->assignment == $mod->instance && !$record->grade > 0) {
+                    if ($record->assignment == $mod->instance && $record->status == 'submitted') {
                         $groupsubmissionsarray[$record->groupid] = true;
-                    } else if ($record->assignment == $mod->instance && $record->grade > 0) {
-                        $groupsubmissionsarray[$record->groupid] = true;
-                        $groupgradingsarray[$record->groupid] = $record->grade;
+                        if ($record->grade > 0) {
+                            $groupgradingsarray[$record->groupid] = $record->grade;
+                        }
                     }
                 }
             }

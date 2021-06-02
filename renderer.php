@@ -181,6 +181,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             ,gm.groupid
             ,gm.userid
             ,asu.assignment
+            ,asu.status
             ,ag.grade
             from {groups} g
             join {groups_members} gm on gm.groupid = g.id
