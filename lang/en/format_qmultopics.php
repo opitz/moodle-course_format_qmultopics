@@ -465,6 +465,7 @@ $string['usestatictext'] = 'Use static text';
 // Badges.
 $string['badge_due'] = 'Due ';
 $string['badge_duetoday'] = 'DUE TODAY ';
+$string['badge_cutoffdate'] = 'LATE submission until  ';
 $string['badge_wasdue'] = 'Was due ';
 $string['badge_spacer'] = '&nbsp;&nbsp;';
 $string['badge_commaspacer'] = ',&nbsp;&nbsp;';

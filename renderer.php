@@ -88,6 +88,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
             ,a.id as assign_id
             ,a.name as assign
             ,a.duedate as assign_duedate
+            ,a.cutoffdate as assign_cutoffdate
             ,a.teamsubmission
             ,a.requireallteammemberssubmit
             ,asu.userid as assign_userid

@@ -187,26 +187,120 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_due_date_badge($duedate) {
+    public function show_due_date_badge0($duedate, $cutoffdate = 0) {
         // If duedate is 0 don't show a badge.
         if ($duedate == 0) {
             return '';
         }
         $dateformat = "%d %B %Y";
+        $badgedate = $duedate;
         $badgeclass = '';
         $duetext = get_string('badge_due', 'format_qmultopics');
         if ($duedate < time()) {
             // The due date has passed - show a red badge.
             $badgeclass = ' badge-danger';
-            $duetext = get_string('badge_duetoday', 'format_qmultopics');
-            if ($duedate < (time() - 86400)) {
-                $duetext = get_string('badge_wasdue', 'format_qmultopics');
+            // If a cutoff date is set and has not elapsed yet show it now
+            if ($cutoffdate >= time()) {
+                $duetext = get_string('badge_cutoffdate', 'format_qmultopics');
+                $badgedate = $cutoffdate;
+            } else {
+                if ($duedate < (time() - 86400)) {
+                    $duetext = get_string('badge_wasdue', 'format_qmultopics');
+                } else {
+                    $duetext = get_string('badge_duetoday', 'format_qmultopics');
+                }
             }
         } else if ($duedate < (time() + (60 * 60 * 24 * 14))) {
             // Only 14 days left until the due date - show a yellow badge.
             $badgeclass = ' badge-warning';
         }
-        $badgecontent = $duetext . userdate($duedate, $dateformat);
+        $badgecontent = $duetext . userdate($badgedate, $dateformat);
+        return $this->html_badge($badgecontent, $badgeclass);
+    }
+    public function show_due_date_badge($duedate, $cutoffdate = 0) {
+        // If duedate is 0 don't show a badge.
+        if ($duedate == 0) {
+            return '';
+        }
+        $dateformat = "%d %B %Y";
+        $badgedate = $duedate;
+        $badgeclass = '';
+
+        $today = new DateTime(); // This object represents current date/time
+        $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+
+        $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$duedate ));
+        $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+
+        $diff = $today->diff( $match_date );
+        $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+
+        switch( true ) {
+            case $diffdays == 0:
+                $badgeclass = ' badge-danger';
+                if ($cutoffdate > 0 && $duedate < time()) {
+                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+
+                    $diff = $today->diff( $match_date );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+
+                    switch( true ) {
+                        case $diffdays == 0:
+                            $duetext = get_string('badge_duetoday', 'format_qmultopics');
+                            break;
+                        case $diffdays < 0:
+                            $duetext = get_string('badge_wasdue', 'format_qmultopics');
+                            break;
+                        default:
+                            $duetext = get_string('badge_cutoffdate', 'format_qmultopics');
+                            $badgedate = $cutoffdate;
+                            break;
+                    }
+                } elseif ($duedate < time()) {
+                    $dateformat = "%d %B %Y %H:%M:%S";
+                    $duetext = get_string('badge_wasdue', 'format_qmultopics');
+                } else {
+                    $duetext = get_string('badge_duetoday', 'format_qmultopics');
+                }
+                break;
+            case $diffdays < 0:
+                if ($cutoffdate > 0) {
+                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+
+                    $diff = $today->diff( $match_date );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+
+                    switch( true ) {
+                        case $diffdays == 0:
+                            $badgeclass = ' badge-danger';
+                            $duetext = get_string('badge_duetoday', 'format_qmultopics');
+                            break;
+                        case $diffdays < 0:
+                            $badgeclass = ' badge-danger';
+                            $duetext = get_string('badge_wasdue', 'format_qmultopics');
+                            break;
+                        default:
+                            $duetext = get_string('badge_cutoffdate', 'format_qmultopics');
+                            $badgedate = $cutoffdate;
+                            break;
+                    }
+                } else {
+                    $badgeclass = ' badge-danger';
+                    $duetext = get_string('badge_wasdue', 'format_qmultopics');
+                }
+                break;
+            case $diffdays < 14:
+                $badgeclass = ' badge-warning';
+                $duetext = get_string('badge_due', 'format_qmultopics');
+                break;
+            default:
+                $duetext = get_string('badge_due', 'format_qmultopics');
+        }
+
+
+        $badgecontent = $duetext . userdate($badgedate, $dateformat);
         return $this->html_badge($badgecontent, $badgeclass);
     }
 
@@ -293,7 +387,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if ($assignment) {
 
             // Show assignment due date.
-            $o .= $this->show_due_date_badge($assignment->assign_duedate);
+            $o .= $this->show_due_date_badge($assignment->assign_duedate, $assignment->assign_cutoffdate);
 
             // Check if the user is able to grade (e.g. is a teacher).
             if (has_capability('mod/assign:grade', $mod->context)) {
