@@ -1034,24 +1034,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $enrolledstudents = $this->enrolled_users($capability);
 
         if ($enrolledstudents) {
-            $submissions = 0;
-            $finished = 0;
+            $submissions = [];
+            $finished = [];
             if (isset($COURSE->module_data)) {
                 foreach ($COURSE->module_data as $module) {
                     if ($module->module_name == 'quiz' && $module->quiz_id == $mod->instance && $module->quiz_userid != null) {
-                        $submissions++;
+                        $submissions[$module->quiz_userid] = 1;
                         if ($module->quiz_state == 'finished') {
-                            $finished++;
+                            $finished[$module->quiz_userid] = 1;
                         }
                     }
                 }
             }
             $badgetext = $pretext
-                .$submissions
+                .count($submissions)
                 .$xofy
                 .count($enrolledstudents)
                 .$posttext
-                .($submissions > 0 ? ', '.$finished.get_string('badge_finished', 'format_qmultopics') : '');
+                .($submissions > 0 ? ', '.count($finished).get_string('badge_finished', 'format_qmultopics') : '');
             ;
 
         }
