@@ -48,7 +48,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * @throws dml_exception
      */
     public function __construct(moodle_page $page, $target) {
-        global $COURSE;
+        global $USER;
 
         parent::__construct($page, $target);
         $this->courseformat = course_get_format($page->course);
@@ -56,14 +56,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
         // If theme badges are not enabled let's use our own course renderer as we want to add badges to the module output.
         $usethemebadges = get_config('format_qmultopics', 'usethemebadges');
         if ($usethemebadges != 1) {
-            $newcourserenderer = new qmultopics_course_renderer($page, null);
-            // But only if there are less that 1000 students enrolled into the course.
-            if (count($newcourserenderer->enrolled_users("")) < 1000) {
-                $this->courserenderer = $newcourserenderer;
-                // Create objects that contain data about modules and groups used in this course.
-                $COURSE->module_data = $this->get_module_data();
-                $COURSE->group_assign_data = $this->get_group_assign_data();
-            }
+            $this->courserenderer = new qmultopics_course_renderer($page, null);
         }
     }
 

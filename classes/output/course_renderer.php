@@ -23,6 +23,44 @@ require_once($CFG->dirroot . '/course/renderer.php');
 class qmultopics_course_renderer extends \core_course_renderer{
 
     /**
+     * Override the constructor so that we can initialise the label caches
+     *
+     * @param moodle_page $page
+     * @param string $target
+     */
+    public function __construct(moodle_page $page, $target) {
+
+        $this->enrolled_students = $this->get_enrolled_students();
+        // Assignment.
+        if (isset($this->enrolled_students['quiz'])){
+            $studentids = implode("','",array_keys($this->enrolled_students['assign']));
+
+            $this->assignment_data = $this->get_assignment_data();
+//            $this->quiz_attempting = $this->get_quiz_attempting($studentids);
+//            $this->quiz_finished = $this->get_quiz_finished($studentids);
+        }
+        // Quiz.
+        if (isset($this->enrolled_students['quiz'])){
+            $studentids = implode("','",array_keys($this->enrolled_students['quiz']));
+
+            $this->quiz_data = $this->get_quiz_data();
+            $this->quiz_submitted = $this->get_quiz_submitted($studentids);
+//            $this->quiz_graded = $this->get_quiz_graded($studentids);
+        }
+
+        parent::__construct($page, $target);
+    }
+
+    protected function get_enrolled_students() {
+        $result = [];
+        $mtypes = ['assign', 'quiz'];
+        foreach ($mtypes as $mtype) {
+            $result[$mtype] = $this->enrolled_users($mtype);
+        }
+        return $result;
+    }
+
+    /**
      * Renders HTML to display one course module in a course section
      *
      * This includes link, content, availability, completion info and additional information
@@ -47,15 +85,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
      */
     public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
         $output = '';
-        /*
-        We return empty string (because course module will not be displayed at all)
-        if:
-        1) The activity is not visible to users
-        and
-        2) The 'availableinfo' is empty, i.e. the activity was
-           hidden in a way that leaves no info, such as using the
-           eye icon.
-        */
+        // We return empty string (because course module will not be displayed at all)
+        // if:
+        // 1) The activity is not visible to users
+        // and
+        // 2) The 'availableinfo' is empty, i.e. the activity was
+        //     hidden in a way that leaves no info, such as using the
+        //     eye icon.
         if (!$mod->is_visible_on_course_page()) {
             return $output;
         }
@@ -74,15 +110,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
-        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
+        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
 
         // This div is used to indent the content.
         $output .= html_writer::div('', $indentclasses);
 
-        // Start a wrapper for the actual content to keep the indentation consistent.
+        // Start a wrapper for the actual content to keep the indentation consistent
         $output .= html_writer::start_tag('div');
 
-        // Display the link to the module (or do nothing if module has no url).
+        // Display the link to the module (or do nothing if module has no url)
         $cmname = $this->course_section_cm_name($mod, $displayoptions);
 
         if (!empty($cmname)) {
@@ -90,22 +126,20 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $cmname;
 
-            // Module can put text after the link (e.g. forum unread).
+
+            // Module can put text after the link (e.g. forum unread)
             $output .= $mod->afterlink;
 
-            // Closing the tag which contains everything but edit icons.
-            // Content part of the module should not be part of this.
-            $output .= html_writer::end_tag('div'); // Activityinstance.
+            // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
+            $output .= html_writer::end_tag('div'); // .activityinstance
         }
 
-        /*
-        If there is content but NO link (eg label), then display the
-        content here (BEFORE any icons). In this case cons must be
-        displayed after the content so that it makes more sense visually
-        and for accessibility reasons, e.g. if you have a one-line label
-        it should work similarly (at least in terms of ordering) to an
-        activity.
-        */
+        // If there is content but NO link (eg label), then display the
+        // content here (BEFORE any icons). In this case cons must be
+        // displayed after the content so that it makes more sense visually
+        // and for accessibility reasons, e.g. if you have a one-line label
+        // it should work similarly (at least in terms of ordering) to an
+        // activity.
         $contentpart = $this->course_section_cm_text($mod, $displayoptions);
         $url = $mod->url;
         if (empty($url)) {
@@ -122,26 +156,26 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
 
         if (!empty($modicons)) {
-            $output .= html_writer::span($modicons, 'actions');
+            $output .= html_writer::div($modicons, 'actions');
         }
 
         // Show availability info (if module is not available).
         $output .= $this->course_section_cm_availability($mod, $displayoptions);
 
-        // If there is content AND a link, then display the content here.
-        // (AFTER any icons). Otherwise it was displayed before.
+        // If there is content AND a link, then display the content here
+        // (AFTER any icons). Otherwise it was displayed before
         if (!empty($url)) {
             $output .= $contentpart;
         }
 
         // Amending badges - but for courses with < 1000 students only
-        if (count($this->enrolled_users('')) < 1000) {
+//        if (count($this->enrolled_users('')) < 1000) {
             $output .= html_writer::start_div();
             $output .= $this->show_badges($mod);
             $output .= html_writer::end_div();
-        }
+//        }
 
-        $output .= html_writer::end_tag('div');
+        $output .= html_writer::end_tag('div'); // $indentclasses
 
         // End of indentation div.
         $output .= html_writer::end_tag('div');
@@ -372,7 +406,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function show_assignment_badges($mod) {
+    public function show_assignment_badges0($mod) {
         global $COURSE;
         $o = '';
 
@@ -394,6 +428,30 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 // Show submission numbers and ungraded submissions if any.
                 // Check if the assignment allows group submissions.
                 if ($assignment->teamsubmission && ! $assignment->requireallteammemberssubmit) {
+                    $o .= $this->show_assign_group_submissions($mod);
+                } else {
+                    $o .= $this->show_assign_submissions($mod);
+                }
+            } else {
+                // Show date of submission.
+                $o .= $this->show_assign_submission($mod);
+            }
+        }
+        return $o;
+    }
+    public function show_assignment_badges($mod) {
+        $o = '';
+        if (isset($this->assignment_data[$mod->instance])) {
+
+            // Show assignment due date.
+            $o .= $this->show_due_date_badge($assignment->assign_duedate, $assignment->assign_cutoffdate);
+            $o .= $this->show_due_date_badge($this->assignment_data[$mod->instance]->duedate, $this->assignment_data[$mod->instance]->cutoffdate);
+
+            // Check if the user is able to grade (e.g. is a teacher).
+            if (has_capability('mod/assign:grade', $mod->context)) {
+                // Show submission numbers and ungraded submissions if any.
+                // Check if the assignment allows group submissions.
+                if ($this->assignment_data[$mod->instance]->teamsubmission && ! $this->assignment_data[$mod->instance]->requireallteammemberssubmit) {
                     $o .= $this->show_assign_group_submissions($mod);
                 } else {
                     $o .= $this->show_assign_submissions($mod);
@@ -987,18 +1045,29 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function show_quiz_badge($mod) {
-        global $COURSE;
+    public function show_quiz_badge0($mod) {
         $o = '';
 
-        if (isset($COURSE->module_data)) {
-            foreach ($COURSE->module_data as $module) {
-                // If the quiz has a due date show it.
-                if ($module->quiz_id == $mod->instance && $module->quiz_duedate > 0) {
-                    $o .= $this->show_due_date_badge($module->quiz_duedate);
-                    break;
-                }
-            }
+        if (isset($this->quiz_duedates) && $this->quiz_duedates[$mod->instance] > 0) {
+            $o .= $this->show_due_date_badge($this->quiz_duedates[$mod->instance]);
+        }
+
+        // Check if the user is able to grade (e.g. is a teacher).
+        if (has_capability('mod/assign:grade', $mod->context)) {
+            // Show submission numbers and ungraded submissions if any.
+            $o .= $this->show_quiz_attempts($mod);
+        } else {
+            // Show date of submission.
+            $o .= $this->show_quiz_attempt($mod);
+        }
+
+        return $o;
+    }
+    public function show_quiz_badge($mod) {
+        $o = '';
+
+        if (isset($this->quiz_data) && $this->quiz_data[$mod->instance]->duedate > 0) {
+            $o .= $this->show_due_date_badge($this->quiz_data[$mod->instance]->duedate);
         }
 
         // Check if the user is able to grade (e.g. is a teacher).
@@ -1021,7 +1090,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function show_quiz_attempts($mod) {
+    public function show_quiz_attempts0($mod) {
         global $COURSE;
 
         // Show attempts by enrolled students.
@@ -1054,6 +1123,37 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 .($submissions > 0 ? ', '.count($finished).get_string('badge_finished', 'format_qmultopics') : '');
             ;
 
+        }
+        if ($badgetext) {
+            return $this->html_badge($badgetext, $badgeclass);
+        } else {
+            return '';
+        }
+    }
+    public function show_quiz_attempts($mod) {
+
+        // Show attempts by enrolled students.
+        $badgetext = '';
+        $badgeclass = '';
+        $capability = 'quiz';
+        $pretext = '';
+        $xofy = get_string('badge_xofy', 'format_qmultopics');
+        $posttext = get_string('badge_attempted', 'format_qmultopics');
+        $enrolledstudents = $this->enrolled_users($capability);
+
+        if ($enrolledstudents) {
+            if (!$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
+                $submissions = 0;
+            }
+            if (!$finished = $this->quiz_submitted[$mod->instance]->finished) {
+                $finished = 0;
+            }
+            $badgetext = $pretext
+                .$submissions
+                .$xofy
+                .count($enrolledstudents)
+                .$posttext
+                .($submissions > 0 ? ', '.$finished.get_string('badge_finished', 'format_qmultopics') : '');
         }
         if ($badgetext) {
             return $this->html_badge($badgetext, $badgeclass);
@@ -1107,5 +1207,143 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $o;
     }
 
+
+    protected function get_assignment_data() {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,a.duedate as duedate
+            ,a.cutoffdate as cutoffdate
+            ,a.teamsubmission
+            ,a.requireallteammemberssubmit
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {assign} a on a.id = cm.instance and a.course = cm.course
+            where m.name = 'assign'
+            and cm.course = $COURSE->id
+        ";
+        return $DB->get_records_sql($sql);
+    }
+
+
+    protected function get_quiz_data() {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,q.timeclose as duedate 
+            #,cm.id
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            # quiz
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+        ";
+        return $DB->get_records_sql($sql);
+    }
+
+    protected function get_quiz_submitted($studentids) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,count(distinct qa.userid) as submitted
+            ,count(distinct case when qa.state = 'finished' then qa.userid end) as finished
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid in ('".$studentids."')
+            group by cm.instance
+        ";
+        return $DB->get_records_sql($sql);
+    }
+
+    protected function get_quiz_attempting($studentids) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,count(distinct qa.userid) as count
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid in ('".$studentids."')
+            group by cm.instance
+        ";
+        $temp = $DB->get_records_sql($sql);
+        $result = [];
+        if ($temp) foreach ($temp as $key=>$value) {
+            $result[$key] = $value->count;
+        }
+        return $result;
+    }
+
+    protected function get_quiz_finished($studentids) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,count(distinct qa.userid) as count
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid in ('".$studentids."')
+            and qa.state = 'finished'
+            group by cm.instance
+        ";
+        $temp = $DB->get_records_sql($sql);
+        $result = [];
+        if ($temp) foreach ($temp as $key=>$value) {
+            $result[$key] = $value->count;
+        }
+        return $result;
+    }
+
+    protected function get_quiz_graded($studentids) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,count(distinct qa.userid) as count
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            # quiz
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            join {quiz_grades} qg on qg.quiz = qa.quiz and qg.userid = qa.userid
+            # grading
+            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = qa.userid)
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid in ('".$studentids."')
+            and qa.state = 'finished'
+            and qg.grade > 0
+            group by cm.instance
+        ";
+        $temp = $DB->get_records_sql($sql);
+        $result = [];
+        if ($temp) foreach ($temp as $key=>$value) {
+            $result[$key] = $value->count;
+        }
+        return $result;
+    }
 }
 
