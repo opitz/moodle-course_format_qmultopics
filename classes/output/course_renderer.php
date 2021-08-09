@@ -632,8 +632,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $coursegroupsarray = [];
             $groupsubmissionsarray = [];
             $groupgradingsarray = [];
-            if (isset($this->group_assign_data)) {
-                foreach ($this->group_assign_data as $record) {
+            if (isset($this->group_assignment_data)) {
+                foreach ($this->group_assignment_data as $record) {
                     $coursegroupsarray[$record->groupid] = $record->groupid;
                     if ($record->assignment == $mod->instance && $record->status == 'submitted') {
                         $groupsubmissionsarray[$record->groupid] = true;
