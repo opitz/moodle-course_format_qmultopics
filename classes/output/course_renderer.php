@@ -29,52 +29,55 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param string $target
      */
     public function __construct(moodle_page $page, $target) {
-        global $COURSE;
-        $this->enrolled_students = $this->get_enrolled_students();
-        // Assignment.
-        if (isset($this->enrolled_students['assign'])){
-            $studentids = implode("','",array_keys($this->enrolled_students['assign']));
+        global $COURSE, $USER;
+        $context = context_course::instance($COURSE->id);
+        $roles = get_user_roles($context, $USER->id, true);
+        $role = key($roles);
+        $rolename = $roles[$role]->shortname;
 
-            $this->assignment_data = $this->get_assignment_data();
-            $this->group_assignment_data = $this->get_group_assignment_data();
-            $this->assignments_submitted = $this->get_assignments_submitted($studentids);
-            $this->assignments_graded = $this->get_assignments_graded($studentids);
-        }
-        // Choice.
-        if (isset($this->enrolled_students['choice'])){
-            $studentids = implode("','",array_keys($this->enrolled_students['choice']));
-
-            $this->choice_data = $this->get_choice_data();
-            $this->choice_answers = $this->get_choice_answers($studentids);
-        }
-        // Feedback.
-        if (isset($this->enrolled_students['feedback'])){
-            $studentids = implode("','",array_keys($this->enrolled_students['feedback']));
-
-            $this->feedback_data = $this->get_feedback_data();
-            $this->feedback_completions = $this->get_feedback_completions($studentids);
-        }
-        // Lesson.
-        if (isset($this->enrolled_students['lesson'])){
-            $studentids = implode("','",array_keys($this->enrolled_students['lesson']));
-
-            $this->lesson_data = $this->get_lesson_data();
-            $this->lesson_submissions = $this->get_lesson_submissions($studentids);
-            $this->lesson_completions = $this->get_lesson_completions($studentids);
-        }
-        // Quiz.
-        if (isset($this->enrolled_students['quiz'])){
-            $studentids = implode("','",array_keys($this->enrolled_students['quiz']));
-
-            $this->quiz_data = $this->get_quiz_data();
-            $this->quiz_submitted = $this->get_quiz_submitted($studentids);
-//            $this->quiz_graded = $this->get_quiz_graded($studentids);
-        }
-
-        $context = context_course::instance($COURSE->id, MUST_EXIST);
-
-        if (is_enrolled($context)) {
+        if ($rolename == 'student') {
             $this->user_data = $this->get_user_data();
+        } else {
+            $this->enrolled_students = $this->get_enrolled_students();
+            // Assignment.
+            if (isset($this->enrolled_students['assign'])){
+                $studentids = implode("','",array_keys($this->enrolled_students['assign']));
+
+                $this->assignment_data = $this->get_assignment_data();
+                $this->group_assignment_data = $this->get_group_assignment_data();
+                $this->assignments_submitted = $this->get_assignments_submitted($studentids);
+                $this->assignments_graded = $this->get_assignments_graded($studentids);
+            }
+            // Choice.
+            if (isset($this->enrolled_students['choice'])){
+                $studentids = implode("','",array_keys($this->enrolled_students['choice']));
+
+                $this->choice_data = $this->get_choice_data();
+                $this->choice_answers = $this->get_choice_answers($studentids);
+            }
+            // Feedback.
+            if (isset($this->enrolled_students['feedback'])){
+                $studentids = implode("','",array_keys($this->enrolled_students['feedback']));
+
+                $this->feedback_data = $this->get_feedback_data();
+                $this->feedback_completions = $this->get_feedback_completions($studentids);
+            }
+            // Lesson.
+            if (isset($this->enrolled_students['lesson'])){
+                $studentids = implode("','",array_keys($this->enrolled_students['lesson']));
+
+                $this->lesson_data = $this->get_lesson_data();
+                $this->lesson_submissions = $this->get_lesson_submissions($studentids);
+                $this->lesson_completions = $this->get_lesson_completions($studentids);
+            }
+            // Quiz.
+            if (isset($this->enrolled_students['quiz'])){
+                $studentids = implode("','",array_keys($this->enrolled_students['quiz']));
+
+                $this->quiz_data = $this->get_quiz_data();
+                $this->quiz_submitted = $this->get_quiz_submitted($studentids);
+//                $this->quiz_graded = $this->get_quiz_graded($studentids);
+            }
         }
 
         parent::__construct($page, $target);
@@ -1533,28 +1536,28 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     $submissions[] = $module;
                 }
             }
+            if (count($submissions)) {
+                foreach ($submissions as $submission) {
+                    switch($submission->quiz_state) {
+                        case "inprogress":
+                            $badgetext = get_string('badge_inprogress',
+                                    'format_qmultopics').userdate($submission->quiz_timestart, $dateformat);
+                            break;
+                        case "finished":
+                            $badgetext = get_string('badge_finished',
+                                    'format_qmultopics').userdate($submission->quiz_submit_time, $dateformat);
+                            break;
+                    }
+                    if ($badgetext) {
+                        $o .= $this->html_badge($badgetext, $badgeclass);
+                    }
+                }
+            } else {
+                $badgetext = get_string('badge_notattempted', 'format_qmultopics');
+                $o .= $this->html_badge($badgetext, $badgeclass);
+            }
         }
 
-        if (count($submissions)) {
-            foreach ($submissions as $submission) {
-                switch($submission->quiz_state) {
-                    case "inprogress":
-                        $badgetext = get_string('badge_inprogress',
-                                'format_qmultopics').userdate($submission->quiz_timestart, $dateformat);
-                        break;
-                    case "finished":
-                        $badgetext = get_string('badge_finished',
-                                'format_qmultopics').userdate($submission->quiz_submit_time, $dateformat);
-                        break;
-                }
-                if ($badgetext) {
-                    $o .= $this->html_badge($badgetext, $badgeclass);
-                }
-            }
-        } else {
-            $badgetext = get_string('badge_notattempted', 'format_qmultopics');
-            $o .= $this->html_badge($badgetext, $badgeclass);
-        }
         return $o;
     }
 
