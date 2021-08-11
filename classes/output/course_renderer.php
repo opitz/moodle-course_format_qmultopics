@@ -86,28 +86,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $role = key($roles);
         $rolename = $roles[$role]->shortname;
 
-        // Get the module data sets
+        // Get the module data sets for the current $COURSE
         $this->assignment_data = $this->get_assignment_data();
         $this->choice_data = $this->get_choice_data();
         $this->feedback_data = $this->get_feedback_data();
         $this->lesson_data = $this->get_lesson_data();
         $this->quiz_data = $this->get_quiz_data();
 
-        if ($rolename == 'student') {
-            $this->user_data = $this->get_user_data();
-
-            $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
-            $this->assignments_graded = $this->get_assignments_graded($USER->id);
-
-            $this->choice_answers = $this->get_choice_answers($USER->id);
-
-            $this->feedback_completions = $this->get_feedback_completions($USER->id);
-
-            $this->lesson_submissions = $this->get_lesson_submissions($USER->id);
-            $this->lesson_completions = $this->get_lesson_completions($USER->id);
-
-            $this->quiz_submitted = $this->get_quiz_submitted($USER->id);
-        } else {
+        if ($rolename != 'student' || is_siteadmin()) {
             $this->enrolled_students = $this->get_enrolled_students();
             // Assignment.
             if (isset($this->enrolled_students['assign'])){
@@ -143,6 +129,25 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 $this->quiz_submitted = $this->get_quiz_submitted($studentids);
 //            $this->quiz_graded = $this->get_quiz_graded($studentids);
             }
+        } else{
+            $this->user_data = $this->get_user_data();
+
+            // Assignment.
+            $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
+            $this->assignments_graded = $this->get_assignments_graded($USER->id);
+
+            // Choice.
+            $this->choice_answers = $this->get_student_choice_answers($USER->id);
+
+            // Feedback.
+            $this->feedback_completions = $this->get_student_feedback_completions($USER->id);
+
+            // Lesson.
+            $this->lesson_submissions = $this->get_student_lesson_submissions($USER->id);
+            $this->lesson_completions = $this->get_student_lesson_completions($USER->id);
+
+            // Quiz.
+            $this->quiz_submitted = $this->get_student_quiz_submitted($USER->id);
         }
 
         parent::__construct($page, $target);
@@ -240,7 +245,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
-
 
     protected function get_enrolled_students() {
         $result = [];
@@ -403,11 +407,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
-//        $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
+        // For some reason the 'w-100' class causes the module titles to be intended randomly(?)
+        // when the QMUL themes are installed
+        // For this reason it is disabled here and replaced by a width applied to the indent div below.
+        //$output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
-        $output .= html_writer::div('', $indentclasses);
+        //$output .= html_writer::div('', $indentclasses);
+        $output .= html_writer::div('', $indentclasses, ['style' => 'width: 10px;']);
 
         // Start a wrapper for the actual content to keep the indentation consistent
         $output .= html_writer::start_tag('div');
@@ -419,7 +427,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
             // Start the div for the activity title, excluding the edit icons.
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $cmname;
-
 
             // Module can put text after the link (e.g. forum unread)
             $output .= $mod->afterlink;
@@ -599,7 +606,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
 
         $badgecontent = $duetext . userdate($badgedate, $dateformat);
-        return $this->html_badge($badgecontent, $badgeclass);
+        return $this->html_badge($badgecontent, '', $badgeclass);
     }
 
     /**
@@ -611,7 +618,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function html_badge($badgetext, $badgeclass = "", $title = "") {
+    public function html_badge($badgetext, $title = "", $badgeclass = "") {
         $o = '';
         $o .= html_writer::div($badgetext, 'badge '.$badgeclass, array('title' => $title));
         $o .= get_string('badge_spacer', 'format_qmultopics');
@@ -906,10 +913,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
     }
     public function show_assign_group_submissions($mod) {
-        global $COURSE;
         // Show group submissions by enrolled students.
         $spacer = get_string('badge_commaspacer', 'format_qmultopics');
-        $badgeclass = '';
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_submitted', 'format_qmultopics');
@@ -952,7 +957,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_badge($badgetext, $badgeclass);
+                return $this->html_badge($badgetext);
             } else {
                 return '';
             }
@@ -1003,8 +1008,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
     }
     public function show_assign_submission($mod) {
-        global $USER;
-        $badgeclass = '';
         $badgetitle = '';
         $dateformat = "%d %B %Y";
         $timeformat = "%d %B %Y %H:%M:%S";
@@ -1020,7 +1023,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetitle = get_string('badge_submission_time_title',
                     'format_qmultopics') . userdate($this->assignments_submitted[$mod->instance]->submit_time, $timeformat);
         }
-        return $this->html_badge($badgetext, $badgeclass, $badgetitle);
+        return $this->html_badge($badgetext, $badgetitle);
     }
 
     /**
@@ -1029,7 +1032,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return array
      */
-    protected function get_grading($mod) {
+    protected function get_grading0($mod) {
         global $USER;
 
         if (isset($this->user_data)) {
@@ -1048,6 +1051,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
         }
         return false;
+    }
+    protected function get_grading($mod) {
+        return $this->assignments_graded[$mod->instance]->graded;
     }
 
     /**
@@ -1173,7 +1179,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_choice_answer($mod) {
+    public function show_choice_answer0($mod) {
         global $USER;
         $badgeclass = '';
         $dateformat = "%d %B %Y";
@@ -1195,6 +1201,17 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetext = get_string('badge_notanswered', 'format_qmultopics');
         }
         return $this->html_badge($badgetext, $badgeclass);
+    }
+    public function show_choice_answer($mod) {
+        $dateformat = "%d %B %Y";
+
+        if ($submittime = $this->choice_answers[$mod->instance]->submit_time) {
+            $badgetext = get_string('badge_answered',
+                    'format_qmultopics').userdate($submittime, $dateformat);
+        } else {
+            $badgetext = get_string('badge_notanswered', 'format_qmultopics');
+        }
+        return $this->html_badge($badgetext);
     }
 
     // Feedbacks.
@@ -1321,7 +1338,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_feedback_completion($mod) {
+    public function show_feedback_completion0($mod) {
         global $USER;
         $badgeclass = '';
         $dateformat = "%d %B %Y";
@@ -1342,6 +1359,16 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
         }
         return $this->html_badge($badgetext, $badgeclass);
+    }
+    public function show_feedback_completion($mod) {
+        $dateformat = "%d %B %Y";
+        if ($submission = $this->feedback_completions[$mod->instance]->completed) {
+            $badgetext = get_string('badge_completed',
+                    'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time, $dateformat);
+        } else {
+            $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
+        }
+        return $this->html_badge($badgetext);
     }
 
     // Lessons.
@@ -1509,7 +1536,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_lesson_attempt($mod) {
+    public function show_lesson_attempt0($mod) {
         global $USER;
         $badgeclass = '';
         $dateformat = "%d %B %Y";
@@ -1535,6 +1562,22 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
         }
         return $this->html_badge($badgetext, $badgeclass);
+    }
+    public function show_lesson_attempt($mod) {
+        $dateformat = "%d %B %Y";
+
+        if ($submission = $this->lesson_submissions[$mod->instance]->submitted) {
+            if ($this->lesson_completions[$mod->instance]->completed) {
+                $badgetext = get_string('badge_completed',
+                        'format_qmultopics').userdate($this->lesson_completions[$mod->instance]->completed, $dateformat);
+            } else {
+                $badgetext = get_string('badge_attempted',
+                        'format_qmultopics').userdate($this->lesson_submissions[$mod->instance]->submit_time, $dateformat);
+            }
+        } else {
+            $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
+        }
+        return $this->html_badge($badgetext);
     }
 
     // Quizzes.
@@ -1608,7 +1651,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_quiz_attempt($mod) {
+    public function show_quiz_attempt0($mod) {
         global $USER;
         $o = '';
         $badgeclass = '';
@@ -1623,6 +1666,43 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
         }
 
+        if (count($submissions)) {
+            foreach ($submissions as $submission) {
+                switch($submission->quiz_state) {
+                    case "inprogress":
+                        $badgetext = get_string('badge_inprogress',
+                                'format_qmultopics').userdate($submission->quiz_timestart, $dateformat);
+                        break;
+                    case "finished":
+                        $badgetext = get_string('badge_finished',
+                                'format_qmultopics').userdate($submission->quiz_submit_time, $dateformat);
+                        break;
+                }
+                if ($badgetext) {
+                    $o .= $this->html_badge($badgetext, $badgeclass);
+                }
+            }
+        } else {
+            $badgetext = get_string('badge_notattempted', 'format_qmultopics');
+            $o .= $this->html_badge($badgetext, $badgeclass);
+        }
+        return $o;
+    }
+    public function show_quiz_attempt($mod) {
+        global $USER;
+        $o = '';
+        $badgeclass = '';
+        $dateformat = "%d %B %Y";
+
+        $submissions = [];
+        if (isset($this->user_data)) {
+            foreach ($this->user_data as $module) {
+                if ($module->module_name == 'quiz' && $module->quiz_id == $mod->instance && $module->quiz_userid == $USER->id) {
+                    $submissions[] = $module;
+                }
+            }
+        }
+        $submissions = $this->quiz_submitted[$mod->instance];
         if (count($submissions)) {
             foreach ($submissions as $submission) {
                 switch($submission->quiz_state) {
@@ -1795,6 +1875,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+    protected function get_student_choice_answers($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,ca.userid as submitted
+            ,ca.timemodified as submit_time
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {choice} c on c.id = cm.instance and c.course = cm.course
+            join {choice_answers} ca on ca.choiceid = c.id
+            where m.name = 'choice'
+            and cm.course = $COURSE->id
+            and ca.userid = $studentid
+        ";
+        return $DB->get_records_sql($sql);
+    }
 
     // Choice.
     protected function get_feedback_data() {
@@ -1827,6 +1925,25 @@ class qmultopics_course_renderer extends \core_course_renderer{
             where m.name = 'feedback'
             and cm.course = $COURSE->id
             and fc.userid in ('".$studentids."')
+            group by cm.instance
+        ";
+        return $DB->get_records_sql($sql);
+    }
+    protected function get_student_feedback_completions($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,fc.userid as completed
+            ,fc.timemodified as submit_time
+           from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {feedback} f on f.id = cm.instance and f.course = cm.course
+            join {feedback_completed} fc on fc.feedback = f.id
+            where m.name = 'feedback'
+            and cm.course = $COURSE->id
+            and fc.userid = $studentid
             group by cm.instance
         ";
         return $DB->get_records_sql($sql);
@@ -1867,6 +1984,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+    protected function get_student_lesson_submissions($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,la.userid as submitted
+            ,la.timeseen as submit_time
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {lesson} l on l.id = cm.instance and l.course = cm.course
+            join {lesson_attempts} la on la.lessonid = l.id
+            where m.name = 'lesson'
+            and cm.course = $COURSE->id
+            and la.userid = $studentid
+        ";
+        return $DB->get_records_sql($sql);
+    }
 
     protected function get_lesson_completions($studentids) {
         global $COURSE, $DB;
@@ -1884,6 +2019,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $COURSE->id
             and lg.userid in ('".$studentids."')
             group by cm.instance
+        ";
+        return $DB->get_records_sql($sql);
+    }
+    protected function get_student_lesson_completions($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,lg.completed as completed
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {lesson} l on l.id = cm.instance and l.course = cm.course
+            join {lesson_attempts} la on la.lessonid = l.id
+            join {lesson_grades} lg on lg.lessonid = la.lessonid and lg.userid = la.userid
+            where m.name = 'lesson'
+            and cm.course = $COURSE->id
+            and lg.userid = $studentid
         ";
         return $DB->get_records_sql($sql);
     }
@@ -1926,6 +2079,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+    protected function get_student_quiz_submitted($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,qa.userid as submitted
+            ,case when qa.state = 'finished' then qa.userid as finished
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid = $studentid
+        ";
+        return $DB->get_records_sql($sql);
+    }
 
     protected function get_quiz_graded($studentids) {
         global $COURSE, $DB;
@@ -1949,6 +2120,35 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and qa.state = 'finished'
             and qg.grade > 0
             group by cm.instance
+        ";
+        $temp = $DB->get_records_sql($sql);
+        $result = [];
+        if ($temp) foreach ($temp as $key=>$value) {
+            $result[$key] = $value->count;
+        }
+        return $result;
+    }
+    protected function get_student_quiz_graded($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+            cm.instance as moduleid
+            ,qa.userid as count
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            # quiz
+            join {quiz} q on q.id = cm.instance and q.course = cm.course
+            join {quiz_attempts} qa on qa.quiz = q.id
+            join {quiz_grades} qg on qg.quiz = qa.quiz and qg.userid = qa.userid
+            # grading
+            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = qa.userid)
+            where m.name = 'quiz'
+            and cm.course = $COURSE->id
+            and qa.userid = $studentid
+            and qa.state = 'finished'
+            and qg.grade > 0
         ";
         $temp = $DB->get_records_sql($sql);
         $result = [];
