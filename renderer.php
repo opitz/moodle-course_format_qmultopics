@@ -48,14 +48,11 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * @throws dml_exception
      */
     public function __construct(moodle_page $page, $target) {
-        global $USER;
-
         parent::__construct($page, $target);
         $this->courseformat = course_get_format($page->course);
         $this->tcsettings = $this->courseformat->get_format_options();
-        // If theme badges are not enabled let's use our own course renderer as we want to add badges to the module output.
-        $usethemebadges = get_config('format_qmultopics', 'usethemebadges');
-        if ($usethemebadges != 1) {
+        // If enabled show lables for assignments on course pages
+        if (get_config('format_qmultopics', 'useassignlabels')) {
             $this->courserenderer = new qmultopics_course_renderer($page, null);
         }
     }
