@@ -144,7 +144,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
             // Lesson.
             $this->lesson_submissions = $this->get_student_lesson_submissions($USER->id);
-            $this->lesson_completions = $this->get_student_lesson_completions($USER->id);
+//            $this->lesson_completions = $this->get_student_lesson_completions($USER->id);
 
             // Quiz.
             $this->quiz_submitted = $this->get_student_quiz_submitted($USER->id);
@@ -1053,7 +1053,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return false;
     }
     protected function get_grading($mod) {
-        return $this->assignments_graded[$mod->instance]->graded;
+        return (isset($this->assignments_graded[$mod->instance]->graded) ? $this->assignments_graded[$mod->instance]->graded : false);
     }
 
     /**
@@ -1552,7 +1552,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
         return $this->html_badge($badgetext, $badgeclass);
     }
-    public function show_lesson_attempt($mod) {
+    public function show_lesson_attempt1($mod) {
         $dateformat = "%d %B %Y";
 
         if (isset($this->lesson_submissions[$mod->instance]->submitted) && $submission = $this->lesson_submissions[$mod->instance]->submitted) {
@@ -1567,6 +1567,26 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
         }
         return $this->html_badge($badgetext);
+    }
+    public function show_lesson_attempt($mod) {
+        $o = '';
+        $dateformat = "%d %B %Y";
+
+        foreach ($this->lesson_submissions as $submission) {
+            if($submission->moduleid == $mod->instance) {
+                if (isset($submission->completed) && $submission->completed) {
+                    $o .=  $this->html_badge(get_string('badge_completed',
+                            'format_qmultopics').userdate($submission->completed, $dateformat));
+                } else {
+                    $o .= $this->html_badge(get_string('badge_attempted',
+                            'format_qmultopics').userdate($submission->submit_time, $dateformat));
+                }
+            }
+        }
+        if ($o != '') {
+            return $o;
+        }
+        return $this->html_badge(get_string('badge_notcompleted', 'format_qmultopics'));
     }
 
     // Quizzes.
@@ -1677,7 +1697,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
         return $o;
     }
-    public function show_quiz_attempt($mod) {
+    public function show_quiz_attempt1($mod) {
         $dateformat = "%d %B %Y";
 
         if (isset($this->quiz_submitted[$mod->instance]->submitted)) {
@@ -1698,6 +1718,31 @@ class qmultopics_course_renderer extends \core_course_renderer{
             return $this->html_badge($badgetext);
         }
         return '';
+    }
+    public function show_quiz_attempt($mod) {
+        $o = '';
+        $dateformat = "%d %B %Y";
+
+        foreach ($this->quiz_submitted as $submission) {
+            if ($submission->moduleid == $mod->instance) {
+                if (isset($submission->submitted) && $submission->submitted) {
+                    switch($submission->state) {
+                        case "inprogress":
+                            $o .= $this->html_badge(get_string('badge_inprogress',
+                                    'format_qmultopics').userdate($submission->timestart, $dateformat));
+                            break;
+                        case "finished":
+                            $o .= $this->html_badge(get_string('badge_finished',
+                                    'format_qmultopics').userdate($submission->submit_time, $dateformat));
+                            break;
+                    }
+                }
+            }
+        }
+        if ($o != '') {
+            return $o;
+        }
+        return $this->html_badge(get_string('badge_notattempted', 'format_qmultopics'));
     }
 
     //==================================================================================================================
@@ -1963,13 +2008,17 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $sql = "
             select
-            cm.instance as moduleid
+            uuid_short()
+            ,cm.instance as moduleid
             ,la.userid as submitted
             ,la.timeseen as submit_time
-            from {course_modules} cm
+            ,lg.grade as grade
+            ,lg.completed as completed
+           from {course_modules} cm
             join {modules} m on m.id = cm.module
             join {lesson} l on l.id = cm.instance and l.course = cm.course
             join {lesson_attempts} la on la.lessonid = l.id
+            left join {lesson_grades} lg on lg.lessonid = la.lessonid and lg.userid = la.userid
             where m.name = 'lesson'
             and cm.course = $COURSE->id
             and la.userid = $studentid
@@ -1996,6 +2045,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+/*
     protected function get_student_lesson_completions($studentid) {
         global $COURSE, $DB;
 
@@ -2014,7 +2064,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
-
+*/
     // Quiz.
     protected function get_quiz_data() {
         global $COURSE, $DB;
@@ -2058,12 +2108,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $sql = "
             select
-            cm.instance as moduleid
+            uuid_short()
+            ,cm.instance as moduleid
             ,qa.userid as submitted
             ,qa.state as state
             ,qa.timestart as timestart
             ,qa.timefinish as submit_time
-            ,case when qa.state = 'finished' then qa.userid end as finished
             from {course_modules} cm
             join {modules} m on m.id = cm.module
             join {quiz} q on q.id = cm.instance and q.course = cm.course
