@@ -51,7 +51,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
         parent::__construct($page, $target);
         $this->courseformat = course_get_format($page->course);
         $this->tcsettings = $this->courseformat->get_format_options();
-        // If enabled show lables for assignments on course pages
+        // If enabled show labels for assignments on course pages
         if (get_config('format_qmultopics', 'useassignlabels')) {
             $this->courserenderer = new qmultopics_course_renderer($page, null);
         }
