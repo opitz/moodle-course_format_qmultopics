@@ -84,7 +84,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $context = context_course::instance($COURSE->id);
         $roles = get_user_roles($context, $USER->id, true);
         $role = key($roles);
-        $rolename = $roles[$role]->shortname;
+        $rolename = isset($roles[$role]) ? $roles[$role]->shortname : '';
 
         // Get the module data sets for the current $COURSE
         $this->assignment_data = $this->get_assignment_data();
@@ -820,10 +820,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         if ($restrictedstudents) {
-            if (!$submissions = $this->assignments_submitted[$mod->instance]->submitted) {
+            if (!isset($this->assignments_submitted[$mod->instance]->submitted) || !$submissions = $this->assignments_submitted[$mod->instance]->submitted) {
                 $submissions = 0;
             }
-            if (!$gradings = $this->assignments_graded[$mod->instance]->graded) {
+            if (!isset($this->assignments_graded[$mod->instance]->graded) || !$gradings = $this->assignments_graded[$mod->instance]->graded) {
                 $gradings = 0;
             }
 
@@ -1012,7 +1012,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $dateformat = "%d %B %Y";
         $timeformat = "%d %B %Y %H:%M:%S";
 
-        if (!$submission = $this->assignments_submitted[$mod->instance]->submitted) {
+        if (!isset($this->assignments_submitted[$mod->instance]->submitted) || !$submission = $this->assignments_submitted[$mod->instance]->submitted) {
             $badgetext = get_string('badge_notsubmitted', 'format_qmultopics');
         } else {
             $badgetext = get_string('badge_submitted',
@@ -1161,7 +1161,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_answered', 'format_qmultopics');
         // Get the number of submissions for this module.
-        if (!$submissions = $this->choice_answers[$mod->instance]->submitted) {
+        if (!isset($this->choice_answers[$mod->instance]->submitted) || !$submissions = $this->choice_answers[$mod->instance]->submitted) {
             $submissions = 0;
         }
         $badgetext = $pretext
@@ -1205,7 +1205,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function show_choice_answer($mod) {
         $dateformat = "%d %B %Y";
 
-        if ($submittime = $this->choice_answers[$mod->instance]->submit_time) {
+        if (isset($this->choice_answers[$mod->instance]->submit_time) && $submittime = $this->choice_answers[$mod->instance]->submit_time) {
             $badgetext = get_string('badge_answered',
                     'format_qmultopics').userdate($submittime, $dateformat);
         } else {
@@ -1362,7 +1362,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
     public function show_feedback_completion($mod) {
         $dateformat = "%d %B %Y";
-        if ($submission = $this->feedback_completions[$mod->instance]->completed) {
+        if (isset($this->feedback_completions[$mod->instance]->completed) && $submission = $this->feedback_completions[$mod->instance]->completed) {
             $badgetext = get_string('badge_completed',
                     'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time, $dateformat);
         } else {
@@ -1406,18 +1406,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $o;
     }
     public function show_lesson_badge($mod) {
-        global $COURSE;
         $o = '';
-
-        if (isset($this->lesson_data)) {
-            foreach ($this->lesson_data as $module) {
-                // If the feedback has a due date show it.
-                if ($module->module_name == 'lesson' & $module->lesson_id == $mod->instance && $module->lesson_duedate > 0) {
-                    $o .= $this->show_due_date_badge($module->lesson_duedate);
-                    break;
-                }
-            }
-        }
 
         if (isset($this->lessonk_data) && $this->lesson_data[$mod->instance]->duedate > 0) {
             $o .= $this->show_due_date_badge($this->lesson_data[$mod->instance]->duedate);
@@ -1566,8 +1555,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function show_lesson_attempt($mod) {
         $dateformat = "%d %B %Y";
 
-        if ($submission = $this->lesson_submissions[$mod->instance]->submitted) {
-            if ($this->lesson_completions[$mod->instance]->completed) {
+        if (isset($this->lesson_submissions[$mod->instance]->submitted) && $submission = $this->lesson_submissions[$mod->instance]->submitted) {
+            if (isset($this->lesson_completions[$mod->instance]->completed) && $this->lesson_completions[$mod->instance]->completed) {
                 $badgetext = get_string('badge_completed',
                         'format_qmultopics').userdate($this->lesson_completions[$mod->instance]->completed, $dateformat);
             } else {
@@ -1627,11 +1616,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $posttext = get_string('badge_attempted', 'format_qmultopics');
 
         // Get the number of submissions for this module.
-        if (!$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
+        if (!isset($this->quiz_submitted[$mod->instance]->submitted) || !$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
             $submissions = 0;
         }
         // Get the number of finished submissions for this module
-        if (!$finished = $this->quiz_submitted[$mod->instance]->finished) {
+        if (!isset($this->quiz_submitted[$mod->instance]->finished) || !$finished = $this->quiz_submitted[$mod->instance]->finished) {
             $finished = 0;
         }
         $badgetext = $pretext
@@ -1689,41 +1678,26 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $o;
     }
     public function show_quiz_attempt($mod) {
-        global $USER;
-        $o = '';
-        $badgeclass = '';
         $dateformat = "%d %B %Y";
 
-        $submissions = [];
-        if (isset($this->user_data)) {
-            foreach ($this->user_data as $module) {
-                if ($module->module_name == 'quiz' && $module->quiz_id == $mod->instance && $module->quiz_userid == $USER->id) {
-                    $submissions[] = $module;
-                }
-            }
-        }
-        $submissions = $this->quiz_submitted[$mod->instance];
-        if (count($submissions)) {
-            foreach ($submissions as $submission) {
-                switch($submission->quiz_state) {
-                    case "inprogress":
-                        $badgetext = get_string('badge_inprogress',
-                                'format_qmultopics').userdate($submission->quiz_timestart, $dateformat);
-                        break;
-                    case "finished":
-                        $badgetext = get_string('badge_finished',
-                                'format_qmultopics').userdate($submission->quiz_submit_time, $dateformat);
-                        break;
-                }
-                if ($badgetext) {
-                    $o .= $this->html_badge($badgetext, $badgeclass);
-                }
+        if (isset($this->quiz_submitted[$mod->instance]->submitted)) {
+            switch($this->quiz_submitted[$mod->instance]->state) {
+                case "inprogress":
+                    $badgetext = get_string('badge_inprogress',
+                            'format_qmultopics').userdate($this->quiz_submitted[$mod->instance]->timestart, $dateformat);
+                    break;
+                case "finished":
+                    $badgetext = get_string('badge_finished',
+                            'format_qmultopics').userdate($this->quiz_submitted[$mod->instance]->submit_time, $dateformat);
+                    break;
             }
         } else {
             $badgetext = get_string('badge_notattempted', 'format_qmultopics');
-            $o .= $this->html_badge($badgetext, $badgeclass);
         }
-        return $o;
+        if ($badgetext) {
+            return $this->html_badge($badgetext);
+        }
+        return '';
     }
 
     //==================================================================================================================
@@ -2086,7 +2060,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
             select
             cm.instance as moduleid
             ,qa.userid as submitted
-            ,case when qa.state = 'finished' then qa.userid as finished
+            ,qa.state as state
+            ,qa.timestart as timestart
+            ,qa.timefinish as submit_time
+            ,case when qa.state = 'finished' then qa.userid end as finished
             from {course_modules} cm
             join {modules} m on m.id = cm.module
             join {quiz} q on q.id = cm.instance and q.course = cm.course
