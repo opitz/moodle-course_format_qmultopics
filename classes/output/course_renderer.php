@@ -130,7 +130,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 //            $this->quiz_graded = $this->get_quiz_graded($studentids);
             }
         } else{
-            $this->user_data = $this->get_user_data();
+//            $this->user_data = $this->get_user_data();
 
             // Assignment.
             $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
@@ -1408,7 +1408,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function show_lesson_badge($mod) {
         $o = '';
 
-        if (isset($this->lessonk_data) && $this->lesson_data[$mod->instance]->duedate > 0) {
+        if (isset($this->lesson_data[$mod->instance]->duedate) && $this->lesson_data[$mod->instance]->duedate) {
             $o .= $this->show_due_date_badge($this->lesson_data[$mod->instance]->duedate);
         }
 
