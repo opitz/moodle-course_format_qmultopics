@@ -78,8 +78,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 $this->quiz_submitted = $this->get_quiz_submitted($studentids);
             }
         } else{
-            $this->user_data = $this->get_user_data();
-
             // Assignment.
             $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
             $this->assignments_graded = $this->get_assignments_graded($USER->id);
@@ -988,7 +986,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignment_data() {
         global $COURSE, $DB;
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'assignment_data');
+        if (!$data = $cache->get($COURSE->id)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,a.duedate as duedate
@@ -1000,8 +1000,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {assign} a on a.id = cm.instance and a.course = cm.course
             where m.name = 'assign'
             and cm.course = $COURSE->id
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($COURSE->id, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_group_assignment_data() {
@@ -1097,10 +1101,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Choice.
-    protected function get_choice_data() {
+    protected function get_choice_data()
+    {
         global $COURSE, $DB;
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'choice_data');
+        if (!$data = $cache->get($COURSE->id)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,c.timeclose as duedate
@@ -1109,8 +1116,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {choice} c on c.id = cm.instance and c.course = cm.course
             where m.name = 'choice'
             and cm.course = $COURSE->id
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($COURSE->id, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_choice_answers($studentids) {
@@ -1151,10 +1162,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Choice.
-    protected function get_feedback_data() {
+    protected function get_feedback_data()
+    {
         global $COURSE, $DB;
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'feedback_data');
+        if (!$data = $cache->get($COURSE->id)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,f.timeclose as duedate
@@ -1163,8 +1177,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {feedback} f on f.id = cm.instance and f.course = cm.course
             where m.name = 'feedback'
             and cm.course = $COURSE->id
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($COURSE->id, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_feedback_completions($studentids) {
@@ -1206,10 +1224,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Lesson.
-    protected function get_lesson_data() {
+    protected function get_lesson_data()
+    {
         global $COURSE, $DB;
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'lesson_data');
+        if (!$data = $cache->get($COURSE->id)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,l.deadline as duedate
@@ -1218,8 +1239,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {lesson} l on l.id = cm.instance and l.course = cm.course
             where m.name = 'lesson'
             and cm.course = $COURSE->id
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($COURSE->id, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_lesson_submissions($studentids) {
@@ -1303,10 +1328,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 */
     // Quiz.
-    protected function get_quiz_data() {
+    protected function get_quiz_data()
+    {
         global $COURSE, $DB;
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'quiz_data');
+        if (!$data = $cache->get($COURSE->id)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,q.timeclose as duedate 
@@ -1317,8 +1345,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {quiz} q on q.id = cm.instance and q.course = cm.course
             where m.name = 'quiz'
             and cm.course = $COURSE->id
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($COURSE->id, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_quiz_submitted($studentids) {
