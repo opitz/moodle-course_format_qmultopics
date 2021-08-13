@@ -491,5 +491,9 @@ $string['useassignlabels'] = 'Use assignment labels';
 $string['useassignlabels_desc'] = 'If switched on labels will be shown for assignments on course pages';
 
 // Cache strings.
-$string['cachedef_assignment_data'] = 'This is the assessment data cache';
+$string['cachedef_assignment_data'] = 'This is the assessment data cache used by assessment labels';
+$string['cachedef_choice_data'] = 'This is the choice data cache used by assessment labels';
+$string['cachedef_feedback_data'] = 'This is the feedback data cache used by assessment labels';
+$string['cachedef_lesson_data'] = 'This is the lesson data cache used by assessment labels';
+$string['cachedef_quiz_data'] = 'This is the quiz data cache used by assessment labels';
 
