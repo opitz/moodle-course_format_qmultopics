@@ -83,7 +83,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $this->group_assign_data = $this->get_group_assign_data();
             // Assignment.
             $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
-            $this->assignments_graded = $this->get_assignments_graded($USER->id);
+            $this->assignments_graded = $this->get_student_assignments_graded($USER->id);
+            $this->group_assignments_graded = $this->get_student_group_assignments_graded($USER->id);
             //$this->group_assignments_graded = $this->get_group_assignments_graded($USER->id);
 
             // Choice.
@@ -436,6 +437,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_assignment_badges($mod) {
+        global $USER;
         $o = '';
         if (isset($this->assignment_data[$mod->instance])) {
 
@@ -609,8 +611,42 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return array
      */
-    protected function get_grading($mod) {
+    protected function get_grading0($mod) {
+        global $COURSE, $USER;
+
+        if (isset($COURSE->module_data)) {
+            foreach ($COURSE->module_data as $module) {
+                if ($module->module_name == 'assign'
+                    && $module->assign_id == $mod->instance
+                    && $module->assign_userid == $USER->id
+                    && $module->assign_grade > 0
+                    && ($module->gi_hidden == 0 || ($module->gi_hidden > 1 && $module->gi_hidden < time()))
+                    && ($module->gg_hidden == 0 || ($module->gg_hidden > 1 && $module->gg_hidden < time()))
+                    && $module->gi_locked == 0
+                    && $module->gg_locked == 0
+                ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    protected function get_grading1($mod) {
         return (isset($this->assignments_graded[$mod->instance]->graded) ? $this->assignments_graded[$mod->instance]->graded : false);
+    }
+    protected function get_grading($mod) {
+        foreach ($this->assignments_graded as $assignment) {
+            if ($assignment->moduleid == $mod->instance
+                && $assignment->grade > 0
+                && ($assignment->gi_hidden == 0 || ($assignment->gi_hidden > 1 && $assignment->gi_hidden < time()))
+                && ($assignment->gg_hidden == 0 || ($assignment->gg_hidden > 1 && $assignment->gg_hidden < time()))
+                && $assignment->gi_locked == 0
+                && $assignment->gg_locked == 0
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -640,14 +676,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return false;
     }
     protected function get_group_grading($mod) {
-        global $USER;
-
-        if (!isset($this->group_assign_data)) {
+        if (!isset($this->group_assignments_graded)) {
             return false;
         }
-        foreach ($this->group_assign_data as $record) {
+        foreach ($this->group_assignments_graded as $record) {
             if ($record->assignment == $mod->instance
-                && $record->userid == $USER->id
                 && $record->grade > 0
                 && ($record->gi_hidden == 0 || ($record->gi_hidden > 1 && $record->gi_hidden < time()))
                 && ($record->gg_hidden == 0 || ($record->gg_hidden > 1 && $record->gg_hidden < time()))
@@ -1128,6 +1161,67 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+    protected function get_student_assignments_graded($studentid) {
+        global $COURSE, $DB;
+
+        $sql = "
+            select
+           uuid_short()
+            ,cm.instance as moduleid
+            ,asu.userid as graded
+            ,ag.grade
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {assign} a on a.id = cm.instance and a.course = cm.course
+            join {assign_submission} asu on asu.assignment = a.id
+            join {assign_grades} ag on ag.assignment = asu.assignment and ag.userid = asu.userid
+            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = ag.userid)
+            where m.name = 'assign'
+            and cm.course = $COURSE->id
+            and asu.userid = $studentid
+            and asu.status = 'submitted'
+            and ag.grade > 0
+            group by cm.instance
+        ";
+        return $DB->get_records_sql($sql);
+    }
+
+    protected function get_student_group_assignments_graded($studentid) {
+        global $COURSE, $DB;
+        $sql = "
+            select
+           uuid_short()
+            ,g.id
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
+            ,gm.id as ID
+            ,gm.groupid
+            ,gm.userid
+            ,asu.assignment
+            ,asu.status
+            ,ag.grade
+            from {groups} g
+            join {groups_members} gm on gm.groupid = g.id
+            left join {assign_submission} asu on asu.groupid = g.id
+            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
+            # grading
+            left join {grade_items} gi on (gi.courseid = g.courseid
+                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
+            left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
+            where g.courseid = $COURSE->id 
+            and asu.userid = 0
+            and gm.userid = $studentid"
+        ;
+
+        return $DB->get_records_sql($sql);
+    }
 
     // Choice.
     protected function get_choice_data()
@@ -1491,33 +1585,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     protected function get_group_assign_data() {
-        global $COURSE, $DB;
-        $sql = "
-            select
-            concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
-            ,g.id
-            ,gi.hidden as gi_hidden
-            ,gi.locked as gi_locked
-            ,gg.hidden as gg_hidden
-            ,gg.locked as gg_locked
-            ,gm.id as ID
-            ,gm.groupid
-            ,gm.userid
-            ,asu.assignment
-            ,asu.status
-            ,ag.grade
-            from {groups} g
-            join {groups_members} gm on gm.groupid = g.id
-            left join {assign_submission} asu on asu.groupid = g.id
-            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
-            # grading
-            left join {grade_items} gi on (gi.courseid = g.courseid
-                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
-            left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
-            where g.courseid = $COURSE->id and asu.userid = 0";
-        return $DB->get_records_sql($sql);
-    }
-    protected function get_group_assignmets_graded() {
         global $COURSE, $DB;
         $sql = "
             select
