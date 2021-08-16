@@ -47,4 +47,9 @@ $definitions = array(
         'staticacceleration' => true,
         'ttl' => 3600
     ),
+    'enrolled_users' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
 );

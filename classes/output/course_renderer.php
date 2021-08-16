@@ -43,6 +43,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $this->quiz_data = $this->get_quiz_data();
 
         if ($rolename != 'student' || is_siteadmin()) {
+            // Pre-load the assessment label data for course admins
             $this->enrolled_students = $this->get_enrolled_students();
             // Assignment.
             if (isset($this->enrolled_students['assign'])){
@@ -78,6 +79,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 $this->quiz_submitted = $this->get_quiz_submitted($studentids);
             }
         } else{
+            // Pre-load the assessment label data for a student
             // Assignment.
             $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
             $this->assignments_graded = $this->get_assignments_graded($USER->id);
@@ -384,37 +386,42 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function enrolled_users($capability) {
         global $COURSE, $DB;
 
-        switch($capability) {
-            case 'assign':
-                $capability = 'mod/assign:submit';
-                break;
-            case 'quiz':
-                $capability = 'mod/quiz:attempt';
-                break;
-            case 'choice':
-                $capability = 'mod/choice:choose';
-                break;
-            case 'feedback':
-                $capability = 'mod/feedback:complete';
-                break;
-            default:
-                // If no modname is specified, assume a count of all users is required.
-                $capability = '';
-        }
+        $cache = cache::make('format_qmultopics', 'enrolled_users');
+        if (!$result = $cache->get($capability)) {
+            switch($capability) {
+                case 'assign':
+                    $capability = 'mod/assign:submit';
+                    break;
+                case 'quiz':
+                    $capability = 'mod/quiz:attempt';
+                    break;
+                case 'choice':
+                    $capability = 'mod/choice:choose';
+                    break;
+                case 'feedback':
+                    $capability = 'mod/feedback:complete';
+                    break;
+                default:
+                    // If no modname is specified, assume a count of all users is required.
+                    $capability = '';
+            }
 
-        $context = \context_course::instance($COURSE->id);
-        $groupid = '';
+            $context = \context_course::instance($COURSE->id);
+            $groupid = '';
 
-        $onlyactive = true;
-        $capjoin = get_enrolled_with_capabilities_join(
-            $context, '', $capability, $groupid, $onlyactive);
-        $sql = "SELECT DISTINCT u.id
+            $onlyactive = true;
+            $capjoin = get_enrolled_with_capabilities_join(
+                $context, '', $capability, $groupid, $onlyactive);
+            $sql = "SELECT DISTINCT u.id
                 FROM {user} u
                 $capjoin->joins
                 WHERE $capjoin->wheres
                 AND u.deleted = 0
                 ";
-        return $DB->get_records_sql($sql, $capjoin->params);
+            $result = $DB->get_records_sql($sql, $capjoin->params);
+            $cache->set($capability, $result);
+        }
+        return $result;
     }
 
     // Assignments.
