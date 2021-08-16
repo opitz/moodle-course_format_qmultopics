@@ -80,12 +80,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
         } else{
             // Pre-load the assessment label data for a student
-            $this->group_assign_data = $this->get_group_assign_data();
             // Assignment.
             $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
             $this->assignments_graded = $this->get_student_assignments_graded($USER->id);
             $this->group_assignments_graded = $this->get_student_group_assignments_graded($USER->id);
-            //$this->group_assignments_graded = $this->get_group_assignments_graded($USER->id);
 
             // Choice.
             $this->choice_answers = $this->get_student_choice_answers($USER->id);
@@ -655,26 +653,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return bool
      */
-    protected function get_group_grading0($mod) {
-        global $USER;
-
-        if (!isset($this->group_assign_data)) {
-            return false;
-        }
-        foreach ($this->group_assign_data as $record) {
-            if ($record->assignment == $mod->instance
-                && $record->userid == $USER->id
-                && $record->grade > 0
-                && ($record->gi_hidden == 0 || ($record->gi_hidden > 1 && $record->gi_hidden < time()))
-                && ($record->gg_hidden == 0 || ($record->gg_hidden > 1 && $record->gg_hidden < time()))
-                && $record->gi_locked == 0
-                && $record->gg_locked == 0
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
     protected function get_group_grading($mod) {
         if (!isset($this->group_assignments_graded)) {
             return false;
@@ -1577,40 +1555,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $result;
     }
 
-
-    /**
-     * Get group related submission and grading data for modules in this course
-     *
-     * @return array
-     * @throws dml_exception
-     */
-    protected function get_group_assign_data() {
-        global $COURSE, $DB;
-        $sql = "
-            select
-            concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
-            ,g.id
-            ,gi.hidden as gi_hidden
-            ,gi.locked as gi_locked
-            ,gg.hidden as gg_hidden
-            ,gg.locked as gg_locked
-            ,gm.id as ID
-            ,gm.groupid
-            ,gm.userid
-            ,asu.assignment
-            ,asu.status
-            ,ag.grade
-            from {groups} g
-            join {groups_members} gm on gm.groupid = g.id
-            left join {assign_submission} asu on asu.groupid = g.id
-            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
-            # grading
-            left join {grade_items} gi on (gi.courseid = g.courseid
-                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
-            left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
-            where g.courseid = $COURSE->id and asu.userid = 0";
-        return $DB->get_records_sql($sql);
-    }
 
 }
 
