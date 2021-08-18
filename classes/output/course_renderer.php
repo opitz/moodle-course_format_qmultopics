@@ -1410,37 +1410,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
-    protected function get_quiz_graded0($studentids) {
-        global $COURSE, $DB;
-
-        $sql = "
-            select
-            cm.instance as moduleid
-            ,count(distinct qa.userid) as count
-            from {course_modules} cm
-            join {modules} m on m.id = cm.module
-            # quiz
-            join {quiz} q on q.id = cm.instance and q.course = cm.course
-            join {quiz_attempts} qa on qa.quiz = q.id
-            join {quiz_grades} qg on qg.quiz = qa.quiz and qg.userid = qa.userid
-            # grading
-            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
-            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = qa.userid)
-            where m.name = 'quiz'
-            and cm.course = $COURSE->id
-            and qa.userid in ('".$studentids."')
-            and qa.state = 'finished'
-            and qg.grade > 0
-            group by cm.instance
-        ";
-        $temp = $DB->get_records_sql($sql);
-        $result = [];
-        if ($temp) foreach ($temp as $key=>$value) {
-            $result[$key] = $value->count;
-        }
-        return $result;
-    }
-
     protected function get_student_quiz_submitted($studentid) {
         global $COURSE, $DB;
 
@@ -1462,37 +1431,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
-
-    protected function get_student_quiz_graded0($studentid) {
-        global $COURSE, $DB;
-
-        $sql = "
-            select
-            cm.instance as moduleid
-            ,qa.userid as count
-            from {course_modules} cm
-            join {modules} m on m.id = cm.module
-            # quiz
-            join {quiz} q on q.id = cm.instance and q.course = cm.course
-            join {quiz_attempts} qa on qa.quiz = q.id
-            join {quiz_grades} qg on qg.quiz = qa.quiz and qg.userid = qa.userid
-            # grading
-            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
-            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = qa.userid)
-            where m.name = 'quiz'
-            and cm.course = $COURSE->id
-            and qa.userid = $studentid
-            and qa.state = 'finished'
-            and qg.grade > 0
-        ";
-        $temp = $DB->get_records_sql($sql);
-        $result = [];
-        if ($temp) foreach ($temp as $key=>$value) {
-            $result[$key] = $value->count;
-        }
-        return $result;
-    }
-
 
 }
 
