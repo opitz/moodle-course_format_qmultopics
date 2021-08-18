@@ -81,7 +81,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         } else{
             // Pre-load the assessment label data for a student
             // Assignment.
-            $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
+            // $this->assignments_submitted = $this->get_student_assignments_submitted($USER->id);
             $this->assignments_graded = $this->get_student_assignments_graded($USER->id);
             $this->group_assignments_graded = $this->get_student_group_assignments_graded($USER->id);
 
@@ -358,7 +358,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
 
         $badgecontent = $duetext . userdate($badgedate, $dateformat);
-        return $this->html_badge($badgecontent, '', $badgeclass);
+        return $this->html_badge($badgecontent, $badgeclass);
     }
 
     /**
@@ -370,7 +370,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function html_badge($badgetext, $title = "", $badgeclass = "") {
+    public function html_badge($badgetext, $badgeclass = "", $title = "") {
         $o = '';
         $o .= html_writer::div($badgetext, 'badge '.$badgeclass, array('title' => $title));
         $o .= get_string('badge_spacer', 'format_qmultopics');
@@ -584,6 +584,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
+    public function show_assign_submission0($mod) {
+        $badgetitle = '';
+        $dateformat = "%d %B %Y";
+        $timeformat = "%d %B %Y %H:%M:%S";
+
+        if (!isset($this->assignments_submitted[$mod->instance]->submitted) || !$submission = $this->assignments_submitted[$mod->instance]->submitted) {
+            $badgetext = get_string('badge_notsubmitted', 'format_qmultopics');
+        } else {
+            $badgetext = get_string('badge_submitted',
+                    'format_qmultopics').userdate($this->assignments_submitted[$mod->instance]->submit_time, $dateformat);
+            if ($this->get_grading($mod) || $this->get_group_grading($mod)) {
+                $badgetext .= get_string('badge_feedback', 'format_qmultopics');
+            }
+            $badgetitle = get_string('badge_submission_time_title',
+                    'format_qmultopics') . userdate($this->assignments_submitted[$mod->instance]->submit_time, $timeformat);
+        }
+        return $this->html_badge($badgetext, '', $badgetitle);
+    }
     public function show_assign_submission($mod) {
         global $COURSE, $USER;
         $context = context_module::instance($mod->id);
@@ -591,6 +609,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 //        $participant = $assign->get_participant($USER->id);
         $user_submission = $assign->get_user_submission($USER->id, false);
         $user_grade = $assign->get_user_grade($USER->id, false);
+        $hidden_grading = $assign->is_hidden_grader();
 
         $badgetitle = '';
         $dateformat = "%d %B %Y";
@@ -601,13 +620,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
         } else {
             $badgetext = get_string('badge_submitted',
                     'format_qmultopics').userdate($user_submission->timemodified, $dateformat);
-            if (isset($user_grade->grade) && $user_grade->grade > 0) {
+            if ($this->get_grading($mod) || $this->get_group_grading($mod)) {
                 $badgetext .= get_string('badge_feedback', 'format_qmultopics');
             }
             $badgetitle = get_string('badge_submission_time_title',
                     'format_qmultopics') . userdate($user_submission->timemodified, $timeformat);
         }
-        return $this->html_badge($badgetext, $badgetitle);
+        return $this->html_badge($badgetext, '', $badgetitle);
     }
 
     /**
@@ -639,10 +658,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_grading1($mod) {
         return (isset($this->assignments_graded[$mod->instance]->graded) ? $this->assignments_graded[$mod->instance]->graded : false);
     }
-    protected function get_grading($mod) {
+    protected function get_grading2($mod) {
         foreach ($this->assignments_graded as $assignment) {
             if ($assignment->moduleid == $mod->instance
                 && $assignment->grade > 0
+                && ($assignment->gi_hidden == 0 || ($assignment->gi_hidden > 1 && $assignment->gi_hidden < time()))
+                && ($assignment->gg_hidden == 0 || ($assignment->gg_hidden > 1 && $assignment->gg_hidden < time()))
+                && $assignment->gi_locked == 0
+                && $assignment->gg_locked == 0
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    protected function get_grading($mod) {
+        foreach ($this->assignments_graded as $assignment) {
+            if ($assignment->instance == $mod->instance
+                && $assignment->finalgrade > 0
                 && ($assignment->gi_hidden == 0 || ($assignment->gi_hidden > 1 && $assignment->gi_hidden < time()))
                 && ($assignment->gg_hidden == 0 || ($assignment->gg_hidden > 1 && $assignment->gg_hidden < time()))
                 && $assignment->gi_locked == 0
@@ -660,7 +693,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @param $mod
      * @return bool
      */
-    protected function get_group_grading($mod) {
+    protected function get_group_grading0($mod) {
         if (!isset($this->group_assignments_graded)) {
             return false;
         }
@@ -671,6 +704,57 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 && ($record->gg_hidden == 0 || ($record->gg_hidden > 1 && $record->gg_hidden < time()))
                 && $record->gi_locked == 0
                 && $record->gg_locked == 0
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    protected function get_group_grading1($mod) {
+        if (!isset($this->group_assignments_graded)) {
+            return false;
+        }
+        foreach ($this->group_assignments_graded as $record) {
+            if ($record->moduleid == $mod->instance
+                && $record->finalgrade > 0
+                && ($record->gi_hidden == 0 || ($record->gi_hidden > 1 && $record->gi_hidden < time()))
+                && ($record->gg_hidden == 0 || ($record->gg_hidden > 1 && $record->gg_hidden < time()))
+                && $record->gi_locked == 0
+                && $record->gg_locked == 0
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    protected function get_group_grading2($mod) {
+        if (!isset($this->group_assignments_graded)) {
+            return false;
+        }
+        foreach ($this->group_assignments_graded as $assignment) {
+            if ($assignment->assignment == $mod->instance
+                && $assignment->grade > 0
+                && ($assignment->gi_hidden == 0 || ($assignment->gi_hidden > 1 && $assignment->gi_hidden < time()))
+                && ($assignment->gg_hidden == 0 || ($assignment->gg_hidden > 1 && $assignment->gg_hidden < time()))
+                && $assignment->gi_locked == 0
+                && $assignment->gg_locked == 0
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+    protected function get_group_grading($mod) {
+        if (!isset($this->group_assignments_graded)) {
+            return false;
+        }
+        foreach ($this->group_assignments_graded as $assignment) {
+            if ($assignment->instance == $mod->instance
+                && $assignment->finalgrade > 0
+                && ($assignment->gi_hidden == 0 || ($assignment->gi_hidden > 1 && $assignment->gi_hidden < time()))
+                && ($assignment->gg_hidden == 0 || ($assignment->gg_hidden > 1 && $assignment->gg_hidden < time()))
+                && $assignment->gi_locked == 0
+                && $assignment->gg_locked == 0
             ) {
                 return true;
             }
@@ -1146,7 +1230,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
-    protected function get_student_assignments_graded($studentid) {
+
+    protected function get_student_assignments_graded0($studentid) {
         global $COURSE, $DB;
 
         $sql = "
@@ -1175,8 +1260,34 @@ class qmultopics_course_renderer extends \core_course_renderer{
         ";
         return $DB->get_records_sql($sql);
     }
+    protected function get_student_assignments_graded($studentid) {
+        global $COURSE, $DB;
 
-    protected function get_student_group_assignments_graded($studentid) {
+        $sql = "
+            select
+            uuid_short()
+            ,cm.instance
+            ,gg.finalgrade
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
+            from {course_modules} cm
+            join {modules} m on m.id = cm.module
+            join {assign} a on a.id = cm.instance and a.course = cm.course
+            join {assign_submission} asu on asu.assignment = a.id
+            join {grade}_items gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
+            where m.name = 'assign'
+            and gg.finalgrade > 0
+            and cm.course = $COURSE->id
+            and asu.userid = $studentid
+            and gg.finalgrade > 0
+        ";
+        return $DB->get_records_sql($sql);
+    }
+
+    protected function get_student_group_assignments_graded0($studentid) {
         global $COURSE, $DB;
         $sql = "
             select
@@ -1200,6 +1311,30 @@ class qmultopics_course_renderer extends \core_course_renderer{
             left join {grade_items} gi on (gi.courseid = g.courseid
                 and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
             left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
+            where g.courseid = $COURSE->id 
+            and asu.userid = 0
+            and gm.userid = $studentid"
+        ;
+
+        return $DB->get_records_sql($sql);
+    }
+    protected function get_student_group_assignments_graded($studentid) {
+        global $COURSE, $DB;
+        $sql = "
+            select
+           uuid_short()
+            ,asu.assignment as instance
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
+            ,gg.finalgrade
+            from {groups} g
+            join {groups_members} gm on gm.groupid = g.id
+            join {assign_submission} asu on asu.groupid = g.id
+            join {grade_items} gi on (gi.courseid = g.courseid
+                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
+            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = gm.userid)
             where g.courseid = $COURSE->id 
             and asu.userid = 0
             and gm.userid = $studentid"
