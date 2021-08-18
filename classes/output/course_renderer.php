@@ -585,20 +585,27 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_assign_submission($mod) {
+        global $COURSE, $USER;
+        $context = context_module::instance($mod->id);
+        $assign = new assign($context, $mod, $COURSE);
+//        $participant = $assign->get_participant($USER->id);
+        $user_submission = $assign->get_user_submission($USER->id, false);
+        $user_grade = $assign->get_user_grade($USER->id, false);
+
         $badgetitle = '';
         $dateformat = "%d %B %Y";
         $timeformat = "%d %B %Y %H:%M:%S";
 
-        if (!isset($this->assignments_submitted[$mod->instance]->submitted) || !$submission = $this->assignments_submitted[$mod->instance]->submitted) {
+        if (!isset($user_submission->status) || $user_submission->status != 'submitted') {
             $badgetext = get_string('badge_notsubmitted', 'format_qmultopics');
         } else {
             $badgetext = get_string('badge_submitted',
-                    'format_qmultopics').userdate($this->assignments_submitted[$mod->instance]->submit_time, $dateformat);
-            if ($this->get_grading($mod) || $this->get_group_grading($mod)) {
+                    'format_qmultopics').userdate($user_submission->timemodified, $dateformat);
+            if (isset($user_grade->grade) && $user_grade->grade > 0) {
                 $badgetext .= get_string('badge_feedback', 'format_qmultopics');
             }
             $badgetitle = get_string('badge_submission_time_title',
-                    'format_qmultopics') . userdate($this->assignments_submitted[$mod->instance]->submit_time, $timeformat);
+                    'format_qmultopics') . userdate($user_submission->timemodified, $timeformat);
         }
         return $this->html_badge($badgetext, $badgetitle);
     }
