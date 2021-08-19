@@ -1005,6 +1005,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
     //==================================================================================================================
 
+    /**
+     * Get information about all assignment assessments of a given course
+     *
+     * @param $courseid
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function get_assignment_data($courseid) {
         global $DB;
 
@@ -1035,6 +1043,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $data;
     }
 
+    /**
+     * Get information about all group assignments of a given course
+     *
+     * @param $courseid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_group_assignment_data($courseid) {
         global $DB;
 
@@ -1069,6 +1084,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get submission numbers by a list of students for all assignments of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_assignments_submitted($courseid, $studentids) {
         global $DB;
 
@@ -1094,6 +1117,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get grading numbers for a list of students for all assignments of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_assignments_graded($courseid, $studentids) {
         global $DB;
 
@@ -1148,6 +1179,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get all graded assignments of a given course and student
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_assignments_graded($courseid, $studentid) {
         global $DB;
 
@@ -1180,6 +1219,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get all graded group assignments of a given course and student
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_group_assignments_graded($courseid, $studentid) {
         global $DB;
 
@@ -1212,6 +1259,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Choice.
+
+    /**
+     * Get information about all choice assessments of a given course
+     *
+     * @param $courseid
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function get_choice_data($courseid) {
         global $DB;
 
@@ -1239,6 +1295,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $data;
     }
 
+    /**
+     * Get choice answer numbers for a list of students for all assignments of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_choice_answers($courseid, $studentids) {
         global $DB;
 
@@ -1263,6 +1327,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get the choice answers for a given course and user
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_choice_answers($courseid, $studentid) {
         global $DB;
 
@@ -1288,6 +1360,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Feedback.
+
+    /**
+     * Get information about all feedback assessments of a given course
+     *
+     * @param $courseid
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function get_feedback_data($courseid)
     {
         global $DB;
@@ -1316,6 +1397,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $data;
     }
 
+    /**
+     * Get the number of completions by a given list of students for all feedback assessments of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_feedback_completions($courseid, $studentids) {
         global $DB;
 
@@ -1340,6 +1429,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get the completions for all feedbacks of a given student and course
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_feedback_completions($courseid, $studentid) {
         global $DB;
 
@@ -1366,6 +1463,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Lesson.
+
+    /**
+     * Get information about all lesson assessments of a given course
+     *
+     * @param $courseid
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function get_lesson_data($courseid)
     {
         global $DB;
@@ -1394,6 +1500,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $data;
     }
 
+    /**
+     * Get the number of submissions of a list of given students for all lessons of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_lesson_submissions($courseid, $studentids) {
         global $DB;
 
@@ -1420,6 +1534,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get the submissions for all lessons of a given course and student
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_lesson_submissions($courseid, $studentid) {
         global $DB;
 
@@ -1449,6 +1571,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     // Quiz.
+
+    /**
+     * Get information about all quiz assessments of a given course
+     *
+     * @param $courseid
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
+     * @throws dml_exception
+     */
     protected function get_quiz_data($courseid)
     {
         global $DB;
@@ -1479,6 +1610,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $data;
     }
 
+    /**
+     * Get the number of submissions of a list of given students for all quizzes of a given course
+     *
+     * @param $courseid
+     * @param $studentids
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_quiz_submitted($courseid, $studentids) {
         global $DB;
 
@@ -1504,6 +1643,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         return $DB->get_records_sql($sql);
     }
 
+    /**
+     * Get the submissions for all quizzes of a given course and student
+     *
+     * @param $courseid
+     * @param $studentid
+     * @return array
+     * @throws dml_exception
+     */
     protected function get_student_quiz_submitted($courseid, $studentid) {
         global $DB;
 
