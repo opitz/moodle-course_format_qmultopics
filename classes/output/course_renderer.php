@@ -1016,7 +1016,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignment_data($courseid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1053,7 +1053,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_group_assignment_data($courseid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1095,7 +1095,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignments_submitted($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1128,12 +1128,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignments_graded($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_assignment_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,count(distinct asu.userid) as graded
@@ -1150,14 +1152,18 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and asu.status = 'submitted'
             and ag.grade > 0
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     protected function get_student_assignments_submitted0($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1190,12 +1196,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_assignments_graded($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_assignment_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             uuid_short()
             ,cm.instance
@@ -1215,8 +1223,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and asu.userid = $studentid
             and gg.finalgrade > 0
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -1230,14 +1242,16 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_group_assignments_graded($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_group_assignment_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
-           uuid_short()
+            uuid_short()
             ,asu.assignment as instance
             ,gi.hidden as gi_hidden
             ,gi.locked as gi_locked
@@ -1252,10 +1266,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = gm.userid)
             where g.courseid = $courseid 
             and asu.userid = 0
-            and gm.userid = $studentid"
-        ;
-
-        return $DB->get_records_sql($sql);
+            and gm.userid = $studentid
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     // Choice.
@@ -1271,7 +1288,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_choice_data($courseid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1306,12 +1323,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_choice_answers($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_choice_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,count(distinct ca.userid) as submitted
@@ -1323,8 +1342,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and ca.userid in ('".$studentids."')
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -1338,12 +1361,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_choice_answers($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_choice_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,ca.userid as submitted
@@ -1355,8 +1380,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             where m.name = 'choice'
             and cm.course = $courseid
             and ca.userid = $studentid
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     // Feedback.
@@ -1373,7 +1402,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1408,12 +1437,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_feedback_completions($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_feedback_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,count(distinct fc.userid) as completed
@@ -1425,8 +1456,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and fc.userid in ('".$studentids."')
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -1440,17 +1475,19 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_feedback_completions($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_feedback_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,fc.userid as completed
             ,fc.timemodified as submit_time
-           from {course_modules} cm
+            from {course_modules} cm
             join {modules} m on m.id = cm.module
             join {feedback} f on f.id = cm.instance and f.course = cm.course
             join {feedback_completed} fc on fc.feedback = f.id
@@ -1458,8 +1495,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and fc.userid = $studentid
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     // Lesson.
@@ -1476,7 +1517,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1511,12 +1552,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_lesson_submissions($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_lesson_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,count(distinct la.userid) as submitted
@@ -1530,8 +1573,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and la.userid in ('".$studentids."')
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -1545,7 +1592,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_lesson_submissions($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1568,7 +1615,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
             where m.name = 'lesson'
             and cm.course = $courseid
             and la.userid = $studentid
-        ";
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
         }
         return $data;
     }
@@ -1587,7 +1637,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
@@ -1624,12 +1674,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_quiz_submitted($courseid, $studentids) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_quiz_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             cm.instance as moduleid
             ,count(distinct qa.userid) as submitted
@@ -1642,8 +1694,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and qa.userid in ('".$studentids."')
             group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
     /**
@@ -1657,7 +1713,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_student_quiz_submitted($courseid, $studentid) {
         global $DB;
 
-        // Check if $courseid is actually a course object and if so get the ID
+        // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
         }

@@ -52,29 +52,58 @@ $definitions = array(
         'staticacceleration' => true,
         'ttl' => 3600
     ),
-    'student_assignment_data' => array(
-        'mode' => cache_store::MODE_APPLICATION,
+    'admin_assignment_data' => array(
+        'mode' => cache_store::MODE_SESSION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
+    ),
+    'admin_group_assignment_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'staticacceleration' => true,
+        'ttl' => 300
+    ),
+    'admin_choice_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'staticacceleration' => true,
+        'ttl' => 300
+    ),
+    'admin_feedback_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'staticacceleration' => true,
+        'ttl' => 300
+    ),
+    'admin_lesson_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'staticacceleration' => true,
+        'ttl' => 300
+    ),
+    'admin_quiz_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'staticacceleration' => true,
+        'ttl' => 300
+    ),
+    'student_assignment_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
+    ),
+    'student_group_assignment_data' => array(
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
     ),
     'student_choice_data' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'staticacceleration' => true,
-        'ttl' => 3600
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
     ),
     'student_feedback_data' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'staticacceleration' => true,
-        'ttl' => 3600
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
     ),
     'student_lesson_data' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'staticacceleration' => true,
-        'ttl' => 3600
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
     ),
     'student_quiz_data' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'staticacceleration' => true,
-        'ttl' => 3600
+        'mode' => cache_store::MODE_SESSION,
+        'ttl' => 300
     ),
 );
