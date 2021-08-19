@@ -52,4 +52,29 @@ $definitions = array(
         'staticacceleration' => true,
         'ttl' => 3600
     ),
+    'student_assignment_data' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
+    'student_choice_data' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
+    'student_feedback_data' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
+    'student_lesson_data' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
+    'student_quiz_data' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+        'staticacceleration' => true,
+        'ttl' => 3600
+    ),
 );

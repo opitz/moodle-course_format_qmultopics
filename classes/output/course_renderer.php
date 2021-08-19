@@ -1550,7 +1550,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_lesson_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             uuid_short()
             ,cm.instance as moduleid
@@ -1567,7 +1569,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and la.userid = $studentid
         ";
-        return $DB->get_records_sql($sql);
+        }
+        return $data;
     }
 
     // Quiz.
@@ -1659,7 +1662,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'student_quiz_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             uuid_short()
             ,cm.instance as moduleid
@@ -1675,7 +1680,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
             and cm.course = $courseid
             and qa.userid = $studentid
         ";
-        return $DB->get_records_sql($sql);
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
     }
 
 }
