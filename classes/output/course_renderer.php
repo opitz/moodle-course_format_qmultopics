@@ -278,7 +278,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
         $dateformat = "%d %B %Y";
         $badgedate = $duedate;
-        $badgeclass = '';
+        $badgeclass = 'badge-default';
 
         $today = new DateTime(); // This object represents current date/time
         $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
@@ -367,7 +367,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function html_badge($badgetext, $badgeclass = "", $title = "") {
+    public function html_badge($badgetext, $badgeclass = "badge-default", $title = "") {
+//        $badgeclass = $badgeclass == '' ? 'badge-default' : $badgeclass;
+        if ($badgeclass == '') {
+            $badgeclass = 'badge-default';
+        }
         $o = '';
         $o .= html_writer::div($badgetext, 'badge '.$badgeclass, array('title' => $title));
         $o .= get_string('badge_spacer', 'format_qmultopics');
