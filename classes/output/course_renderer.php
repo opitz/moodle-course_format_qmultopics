@@ -51,7 +51,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
                 $this->group_assignment_data = $this->get_group_assignment_data($COURSE->id);
                 $this->assignments_submitted = $this->get_assignments_submitted($COURSE->id, $studentids);
-                $this->assignments_graded = $this->get_assignments_graded($COURSE->id, $studentids);
             }
             // Choice.
             if (isset($this->enrolled_students['choice'])){
@@ -495,8 +494,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 !$submissions = $this->assignments_submitted[$mod->instance]->submitted) {
                 $submissions = 0;
             }
-            if (!isset($this->assignments_graded[$mod->instance]->graded) ||
-                !$gradings = $this->assignments_graded[$mod->instance]->graded) {
+            if (!isset($this->assignments_submitted[$mod->instance]->graded) ||
+                !$gradings = $this->assignments_submitted[$mod->instance]->graded) {
                 $gradings = 0;
             }
 
@@ -531,6 +530,60 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
+    public function show_assign_group_submissions0($mod) {
+        global $CFG;
+
+        // Show group submissions by enrolled students.
+        $spacer = get_string('badge_commaspacer', 'format_qmultopics');
+        $pretext = '';
+        $xofy = get_string('badge_xofy', 'format_qmultopics');
+        $posttext = get_string('badge_submitted', 'format_qmultopics');
+        $groupstext = get_string('badge_groups', 'format_qmultopics');
+        $ungradedtext = get_string('badge_ungraded', 'format_qmultopics');
+        $enrolledstudents = $this->enrolled_users('assign');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        if ($enrolledstudents) {
+            // Go through the group_data to get numbers for groups, submissions and gradings.
+            $coursegroupsarray = [];
+            $groupsubmissionsarray = [];
+            $groupgradingsarray = [];
+            if (isset($this->group_assignment_data)) {
+                foreach ($this->group_assignment_data as $record) {
+                    $coursegroupsarray[$record->groupid] = $record->groupid;
+                    if ($record->assignment == $mod->instance && $record->status == 'submitted') {
+                        $groupsubmissionsarray[$record->groupid] = true;
+                        if ($record->grade > 0) {
+                            $groupgradingsarray[$record->groupid] = $record->grade;
+                        }
+                    }
+                }
+            }
+            $coursegroups = count($coursegroupsarray);
+            $groupsubmissions = count($groupsubmissionsarray);
+            $groupgradings = count($groupgradingsarray);
+            $ungraded = $groupsubmissions - $groupgradings;
+            $badgetext = $pretext
+                .$groupsubmissions
+                .$xofy
+                .$coursegroups
+                .$groupstext
+                .$posttext;
+            // If there are ungraded submissions show that in the badge as well.
+            if ($ungraded) {
+                $badgetext =
+                    $badgetext
+                    .$spacer
+                    .$ungraded
+                    .$ungradedtext;
+            }
+
+            if ($badgetext) {
+                return $this->html_badge($badgetext,'','',$url);
+            } else {
+                return '';
+            }
+        }
+    }
     public function show_assign_group_submissions($mod) {
         global $CFG;
 
@@ -1085,7 +1138,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return array
      * @throws dml_exception
      */
-    protected function get_group_assignment_data($courseid) {
+    protected function get_group_assignment_data0($courseid) {
         global $DB;
 
         // Check if $courseid is actually a course object and if so get the ID.
@@ -1093,7 +1146,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $courseid = $courseid->id;
         }
 
-        $sql = "
+        $cache = cache::make('format_qmultopics', 'admin_group_assignment_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
             select
             concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
             ,g.id
@@ -1115,12 +1170,63 @@ class qmultopics_course_renderer extends \core_course_renderer{
             left join {grade_items} gi on (gi.courseid = g.courseid
                 and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
             left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
-            where g.courseid = $courseid and asu.userid = 0";
+            where g.courseid = $courseid and asu.userid = 0
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
+        $sql = "
+            ";
+        return $DB->get_records_sql($sql);
+    }
+    protected function get_group_assignment_data($courseid) {
+        global $DB;
+
+        // Check if $courseid is actually a course object and if so get the ID.
+        if (is_object($courseid)) {
+            $courseid = $courseid->id;
+        }
+
+        $cache = cache::make('format_qmultopics', 'admin_group_assignment_data');
+        if (!$data = $cache->get($courseid)) {
+            $sql = "
+            select
+            concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
+            ,g.id
+            ,gi.hidden as gi_hidden
+            ,gi.locked as gi_locked
+            ,gg.hidden as gg_hidden
+            ,gg.locked as gg_locked
+            ,gm.id as ID
+            ,gm.groupid
+            ,gm.userid
+            ,asu.assignment
+            ,asu.status
+            ,ag.grade
+            from {groups} g
+            join {groups_members} gm on gm.groupid = g.id
+            left join {assign_submission} asu on asu.groupid = g.id
+            left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
+            # grading
+            left join {grade_items} gi on (gi.courseid = g.courseid
+                and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
+            left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
+            where g.courseid = $courseid and asu.userid = 0
+            ";
+            if ($data = $DB->get_records_sql($sql)) {
+                $cache->set($courseid, $data);
+            }
+        }
+        return $data;
+        $sql = "
+            ";
         return $DB->get_records_sql($sql);
     }
 
     /**
-     * Get submission numbers by a list of students for all assignments of a given course
+     * Get submission and grading numbers by a list of students for all assignments of a given course
      *
      * @param $courseid
      * @param $studentids
@@ -1135,57 +1241,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $courseid = $courseid->id;
         }
 
-        $sql = "
-            select
-            cm.instance as moduleid
-            ,count(distinct asu.userid) as submitted
-            from {course_modules} cm
-            join {modules} m on m.id = cm.module
-            join {assign} a on a.id = cm.instance and a.course = cm.course
-            join {assign_submission} asu on asu.assignment = a.id
-            where m.name = 'assign'
-            and cm.course = $courseid
-            and asu.userid in ('".$studentids."')
-            and asu.status = 'submitted'
-            group by cm.instance
-        ";
-        return $DB->get_records_sql($sql);
-    }
-
-    /**
-     * Get grading numbers for a list of students for all assignments of a given course
-     *
-     * @param $courseid
-     * @param $studentids
-     * @return array
-     * @throws dml_exception
-     */
-    protected function get_assignments_graded($courseid, $studentids) {
-        global $DB;
-
-        // Check if $courseid is actually a course object and if so get the ID.
-        if (is_object($courseid)) {
-            $courseid = $courseid->id;
-        }
-
         $cache = cache::make('format_qmultopics', 'admin_assignment_data');
         if (!$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
-            ,count(distinct asu.userid) as graded
+            ,count(distinct asu.userid) as submitted
+            ,count(distinct gg.userid) as graded
             from {course_modules} cm
             join {modules} m on m.id = cm.module
             join {assign} a on a.id = cm.instance and a.course = cm.course
             join {assign_submission} asu on asu.assignment = a.id
-            join {assign_grades} ag on ag.assignment = asu.assignment and ag.userid = asu.userid
-            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
-            join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = ag.userid)
+            left join {assign_grades} ag on ag.assignment = asu.assignment and ag.userid = asu.userid and ag.grade > 0
+            left join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            left join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = ag.userid)
             where m.name = 'assign'
             and cm.course = $courseid
             and asu.userid in ('".$studentids."')
             and asu.status = 'submitted'
-            and ag.grade > 0
             group by cm.instance
             ";
             if ($data = $DB->get_records_sql($sql)) {

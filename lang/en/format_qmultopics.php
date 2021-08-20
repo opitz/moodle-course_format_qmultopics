@@ -496,4 +496,17 @@ $string['cachedef_choice_data'] = 'This is the choice data cache used by assessm
 $string['cachedef_feedback_data'] = 'This is the feedback data cache used by assessment labels';
 $string['cachedef_lesson_data'] = 'This is the lesson data cache used by assessment labels';
 $string['cachedef_quiz_data'] = 'This is the quiz data cache used by assessment labels';
-
+// Admin caches.
+$string['cachedef_admin_assignment_data'] = 'Cache holding assignment submission and grading numbers for all eligible students of a course';
+$string['cachedef_admin_group_assignment_data'] = 'Cache holding assignment submission and grading numbers for all eligible student groups of a course';
+$string['cachedef_admin_choice_data'] = 'Cache holding choice submission numbers for all eligible students of a course';
+$string['cachedef_admin_feedback_data'] = 'Cache holding feedback submission numbers for all eligible students of a course';
+$string['cachedef_admin_lesson_data'] = 'Cache holding lesson submission numbers for all eligible students of a course';
+$string['cachedef_admin_quiz_data'] = 'Cache holding quiz submission numbers for all eligible students of a course';
+// Student caches.
+$string['cachedef_student_assessment_data'] = 'Cache holding all assignment submissions for a course by a student';
+$string['cachedef_student_group_assessment_data'] = 'Cache holding all group assignment submissions for a course by a student';
+$string['cachedef_student_choice_data'] = 'Cache holding all choice submissions for a course by a student';
+$string['cachedef_student_feedback_data'] = 'Cache holding all feedback submissions for a course by a student';
+$string['cachedef_student_lesson_data'] = 'Cache holding all lesson submissions for a course by a student';
+$string['cachedef_student_quiz_data'] = 'Cache holding all quiz submissions for a course by a student';
