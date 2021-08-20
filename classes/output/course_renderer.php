@@ -271,7 +271,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function show_due_date_badge($duedate, $cutoffdate = 0) {
+    public function show_due_date_badge($mod, $duedate, $cutoffdate = 0) {
+        global $CFG;
         // If duedate is 0 don't show a badge.
         if ($duedate == 0) {
             return '';
@@ -279,6 +280,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $dateformat = "%d %B %Y";
         $badgedate = $duedate;
         $badgeclass = 'badge-default';
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         $today = new DateTime(); // This object represents current date/time
         $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
@@ -355,7 +357,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
 
         $badgecontent = $duetext . userdate($badgedate, $dateformat);
-        return $this->html_badge($badgecontent, $badgeclass);
+        return $this->html_badge($badgecontent, $badgeclass,'', $url);
     }
 
     /**
@@ -367,11 +369,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return string
      * @throws coding_exception
      */
-    public function html_badge($badgetext, $badgeclass = "badge-default", $title = "") {
+    public function html_badge($badgetext, $badgeclass = "badge-default", $title = "", $url = "") {
         if ($badgeclass == '') {
             $badgeclass = 'badge-default';
         }
         $o = '';
+        if ($url != '') {
+            $badgetext = "<a href='$url'>".$badgetext."</a>";
+        }
         $o .= html_writer::div($badgetext, 'badge '.$badgeclass, array('title' => $title));
         $o .= get_string('badge_spacer', 'format_qmultopics');
         return $o;
@@ -437,9 +442,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function show_assignment_badges($mod) {
         $o = '';
         if (isset($this->assignment_data[$mod->instance])) {
-
             // Show assignment due date if it has one.
-            $o .= $this->show_due_date_badge($this->assignment_data[$mod->instance]->duedate, $this->assignment_data[$mod->instance]->cutoffdate);
+            $o .= $this->show_due_date_badge($mod, $this->assignment_data[$mod->instance]->duedate, $this->assignment_data[$mod->instance]->cutoffdate);
 
             // Check if the user is able to grade (e.g. is a teacher).
             if (has_capability('mod/assign:grade', $mod->context)) {
@@ -467,6 +471,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_assign_submissions($mod) {
+        global $CFG;
+
         // Show submissions by enrolled students.
         $spacer = get_string('badge_commaspacer', 'format_qmultopics');
         $pretext = '';
@@ -474,6 +480,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $posttext = get_string('badge_submitted', 'format_qmultopics');
         $ungradedtext = get_string('badge_ungraded', 'format_qmultopics');
         $enrolledstudents = $this->enrolled_users('assign');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         if (!empty($mod->availability)) {
             // Get availability information.
@@ -509,7 +516,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_badge($badgetext);
+                return $this->html_badge($badgetext, '', '', $url);
             } else {
                 return '';
             }
@@ -525,6 +532,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_assign_group_submissions($mod) {
+        global $CFG;
+
         // Show group submissions by enrolled students.
         $spacer = get_string('badge_commaspacer', 'format_qmultopics');
         $pretext = '';
@@ -533,6 +542,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $groupstext = get_string('badge_groups', 'format_qmultopics');
         $ungradedtext = get_string('badge_ungraded', 'format_qmultopics');
         $enrolledstudents = $this->enrolled_users('assign');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         if ($enrolledstudents) {
             // Go through the group_data to get numbers for groups, submissions and gradings.
             $coursegroupsarray = [];
@@ -569,7 +579,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_badge($badgetext);
+                return $this->html_badge($badgetext,'','',$url);
             } else {
                 return '';
             }
@@ -577,7 +587,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     /**
-     * A badge to show the student as $USER her/his submission status
+     * A badge to show the student her/his submission status
      * It will display the date of a submission, a mouseover will show the time for the submission
      *
      * @param $mod
@@ -585,10 +595,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_assign_submission($mod) {
-        global $COURSE, $USER;
+        global $CFG, $COURSE, $USER;
+
         $context = context_module::instance($mod->id);
         $assign = new assign($context, $mod, $COURSE);
         $user_submission = $assign->get_user_submission($USER->id, false);
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         $badgetitle = '';
         $dateformat = "%d %B %Y";
@@ -605,11 +617,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $badgetitle = get_string('badge_submission_time_title',
                     'format_qmultopics') . userdate($user_submission->timemodified, $timeformat);
         }
-        return $this->html_badge($badgetext, '', $badgetitle);
+        return $this->html_badge($badgetext, '', $badgetitle, $url);
     }
 
     /**
-     * Return true if the given student as $USER has been graded yet and the grading is neither hidden nor locked
+     * Return true if the given student has been graded yet and the grading is neither hidden nor locked
      *
      * @param $mod
      * @return array
@@ -668,7 +680,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         if (isset($this->choice_data[$mod->instance])) {
             // Show a due date badge if there is a due date.
-            $o .= $this->show_due_date_badge($this->choice_data[$mod->instance]->duedate);
+            $o .= $this->show_due_date_badge($mod, $this->choice_data[$mod->instance]->duedate);
 
             // Check if the user is able to grade (e.g. is a teacher).
             if (has_capability('mod/assign:grade', $mod->context)) {
@@ -692,12 +704,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_choice_answers($mod) {
+        global $CFG;
+
         if (!$enrolledstudents = $this->enrolled_users('choice')) {
             return '';
         }
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_answered', 'format_qmultopics');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         // Get the number of submissions for this module.
         if (!isset($this->choice_answers[$mod->instance]->submitted) || !$submissions = $this->choice_answers[$mod->instance]->submitted) {
             $submissions = 0;
@@ -707,18 +722,21 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .$xofy
             .count($enrolledstudents)
             .$posttext;
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext,'','',$url);
     }
 
     /**
-     * Show choice answer for current student as $USER
+     * Show choice answer for current student
      *
      * @param $mod
      * @return string
      * @throws coding_exception
      */
     public function show_choice_answer($mod) {
+        global $CFG;
+
         $dateformat = "%d %B %Y";
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         if (isset($this->choice_answers[$mod->instance]->submit_time) && $submittime = $this->choice_answers[$mod->instance]->submit_time) {
             $badgetext = get_string('badge_answered',
@@ -726,7 +744,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         } else {
             $badgetext = get_string('badge_notanswered', 'format_qmultopics');
         }
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext,'','',$url);
     }
 
     // Feedbacks.
@@ -742,7 +760,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $o = '';
 
         if (isset($this->choice_data[$mod->instance])) {
-            $o .= $this->show_due_date_badge($this->feedback_data[$mod->instance]->duedate);
+            $o .= $this->show_due_date_badge($mod, $this->feedback_data[$mod->instance]->duedate);
         }
         // Check if the user is able to grade (e.g. is a teacher).
         if (has_capability('mod/assign:grade', $mod->context)) {
@@ -765,6 +783,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_feedback_completions($mod) {
+        global $CFG;
+
         if (!$enrolledstudents = $this->enrolled_users('feedback')) {
             return '';
         }
@@ -773,6 +793,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_completed', 'format_qmultopics');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!$completions = $this->feedback_completions[$mod->instance]->completed) {
@@ -783,25 +804,28 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .$xofy
             .count($enrolledstudents)
             .$posttext;
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext,'','',$url);
     }
 
     /**
-     * Show feedback by current student as $USER
+     * Show feedback by current student
      *
      * @param $mod
      * @return string
      * @throws coding_exception
      */
     public function show_feedback_completion($mod) {
+        global $CFG;
+
         $dateformat = "%d %B %Y";
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
         if (isset($this->feedback_completions[$mod->instance]->completed) && $submission = $this->feedback_completions[$mod->instance]->completed) {
             $badgetext = get_string('badge_completed',
                     'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time, $dateformat);
         } else {
             $badgetext = get_string('badge_notcompleted', 'format_qmultopics');
         }
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext,'','',$url);
     }
 
     // Lessons.
@@ -817,7 +841,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $o = '';
 
         if (isset($this->lesson_data[$mod->instance]->duedate) && $this->lesson_data[$mod->instance]->duedate) {
-            $o .= $this->show_due_date_badge($this->lesson_data[$mod->instance]->duedate);
+            $o .= $this->show_due_date_badge($mod, $this->lesson_data[$mod->instance]->duedate);
         }
 
         // Check if the user is able to grade (e.g. is a teacher).
@@ -841,6 +865,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_lesson_attempts($mod) {
+        global $CFG;
+
         if (!$enrolledstudents = $this->enrolled_users('lesson')) {
             return '';
         }
@@ -851,7 +877,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_attempted', 'format_qmultopics');
         $completedtext = get_string('badge_completed', 'format_qmultopics');
-
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!$submissions = $this->lesson_submissions[$mod->instance]->submitted) {
@@ -875,35 +901,38 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 .$completed
                 .$completedtext;
         }
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext,'','',$url);
     }
 
     /**
-     * Show lesson attempt for the current student as $USER
+     * Show lesson attempt for the current student
      *
      * @param $mod
      * @return string
      * @throws coding_exception
      */
     public function show_lesson_attempt($mod) {
+        global $CFG;
+
         $o = '';
         $dateformat = "%d %B %Y";
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         foreach ($this->lesson_submissions as $submission) {
             if($submission->moduleid == $mod->instance) {
                 if (isset($submission->completed) && $submission->completed) {
                     $o .=  $this->html_badge(get_string('badge_completed',
-                            'format_qmultopics').userdate($submission->completed, $dateformat));
+                            'format_qmultopics').userdate($submission->completed, $dateformat),'','',$url);
                 } else {
                     $o .= $this->html_badge(get_string('badge_attempted',
-                            'format_qmultopics').userdate($submission->submit_time, $dateformat));
+                            'format_qmultopics').userdate($submission->submit_time, $dateformat),'','',$url);
                 }
             }
         }
         if ($o != '') {
             return $o;
         }
-        return $this->html_badge(get_string('badge_notcompleted', 'format_qmultopics'));
+        return $this->html_badge(get_string('badge_notcompleted', 'format_qmultopics'),'','',$url);
     }
 
     // Quizzes.
@@ -919,7 +948,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $o = '';
 
         if (isset($this->quiz_data) && $this->quiz_data[$mod->instance]->duedate > 0) {
-            $o .= $this->show_due_date_badge($this->quiz_data[$mod->instance]->duedate);
+            $o .= $this->show_due_date_badge($mod, $this->quiz_data[$mod->instance]->duedate);
         }
 
         // Check if the user is able to grade (e.g. is a teacher).
@@ -943,6 +972,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_quiz_attempts($mod) {
+        global $CFG;
+
         if (!$enrolledstudents = $this->enrolled_users('quiz')) {
             return '';
         }
@@ -951,6 +982,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_attempted', 'format_qmultopics');
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!isset($this->quiz_submitted[$mod->instance]->submitted) || !$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
@@ -967,19 +999,22 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .$posttext
             .($submissions > 0 ? ', '.$finished.get_string('badge_finished', 'format_qmultopics') : '');
 
-        return $this->html_badge($badgetext);
+        return $this->html_badge($badgetext, '', '', $url);
     }
 
     /**
-     * Show quiz attempts for the current student as $USER
+     * Show quiz attempts for the current student
      *
      * @param $mod
      * @return string
      * @throws coding_exception
      */
     public function show_quiz_attempt($mod) {
+        global $CFG;
+
         $o = '';
         $dateformat = "%d %B %Y";
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         foreach ($this->quiz_submitted as $submission) {
             if ($submission->moduleid == $mod->instance) {
@@ -987,11 +1022,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     switch($submission->state) {
                         case "inprogress":
                             $o .= $this->html_badge(get_string('badge_inprogress',
-                                    'format_qmultopics').userdate($submission->timestart, $dateformat));
+                                    'format_qmultopics').userdate($submission->timestart, $dateformat),'','',$url);
                             break;
                         case "finished":
                             $o .= $this->html_badge(get_string('badge_finished',
-                                    'format_qmultopics').userdate($submission->submit_time, $dateformat));
+                                    'format_qmultopics').userdate($submission->submit_time, $dateformat),'','',$url);
                             break;
                     }
                 }
@@ -1000,7 +1035,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if ($o != '') {
             return $o;
         }
-        return $this->html_badge(get_string('badge_notattempted', 'format_qmultopics'));
+        return $this->html_badge(get_string('badge_notattempted', 'format_qmultopics'),'','',$url);
     }
 
     //==================================================================================================================
