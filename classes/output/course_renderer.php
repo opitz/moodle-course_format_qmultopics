@@ -279,7 +279,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $dateformat = "%d %B %Y";
         $badgedate = $duedate;
         $badgeclass = 'badge-default';
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         $today = new DateTime(); // This object represents current date/time
         $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
@@ -479,7 +479,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $posttext = get_string('badge_submitted', 'format_qmultopics');
         $ungradedtext = get_string('badge_ungraded', 'format_qmultopics');
         $enrolledstudents = $this->enrolled_users('assign');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         if (!empty($mod->availability)) {
             // Get availability information.
@@ -595,7 +595,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $groupstext = get_string('badge_groups', 'format_qmultopics');
         $ungradedtext = get_string('badge_ungraded', 'format_qmultopics');
         $enrolledstudents = $this->enrolled_users('assign');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         if ($enrolledstudents) {
             // Go through the group_data to get numbers for groups, submissions and gradings.
             $coursegroupsarray = [];
@@ -653,7 +653,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $context = context_module::instance($mod->id);
         $assign = new assign($context, $mod, $COURSE);
         $user_submission = $assign->get_user_submission($USER->id, false);
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         $badgetitle = '';
         $dateformat = "%d %B %Y";
@@ -765,7 +765,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_answered', 'format_qmultopics');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         // Get the number of submissions for this module.
         if (!isset($this->choice_answers[$mod->instance]->submitted) || !$submissions = $this->choice_answers[$mod->instance]->submitted) {
             $submissions = 0;
@@ -789,7 +789,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         global $CFG;
 
         $dateformat = "%d %B %Y";
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         if (isset($this->choice_answers[$mod->instance]->submit_time) && $submittime = $this->choice_answers[$mod->instance]->submit_time) {
             $badgetext = get_string('badge_answered',
@@ -846,7 +846,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_completed', 'format_qmultopics');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!$completions = $this->feedback_completions[$mod->instance]->completed) {
@@ -871,7 +871,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         global $CFG;
 
         $dateformat = "%d %B %Y";
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
         if (isset($this->feedback_completions[$mod->instance]->completed) && $submission = $this->feedback_completions[$mod->instance]->completed) {
             $badgetext = get_string('badge_completed',
                     'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time, $dateformat);
@@ -930,7 +930,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_attempted', 'format_qmultopics');
         $completedtext = get_string('badge_completed', 'format_qmultopics');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!$submissions = $this->lesson_submissions[$mod->instance]->submitted) {
@@ -969,7 +969,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $o = '';
         $dateformat = "%d %B %Y";
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         foreach ($this->lesson_submissions as $submission) {
             if($submission->moduleid == $mod->instance) {
@@ -1035,7 +1035,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('badge_xofy', 'format_qmultopics');
         $posttext = get_string('badge_attempted', 'format_qmultopics');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
         if (!isset($this->quiz_submitted[$mod->instance]->submitted) || !$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
@@ -1067,7 +1067,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $o = '';
         $dateformat = "%d %B %Y";
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?id='.$mod->id;
+        $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         foreach ($this->quiz_submitted as $submission) {
             if ($submission->moduleid == $mod->instance) {
