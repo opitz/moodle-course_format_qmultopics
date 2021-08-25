@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
-    /* Format assignemnt badges - 1 = no, 2 = yes. */
+    /* Format assignemnt badges - 0 = no, 1 = yes. */
     $name = 'format_qmultopics/useassignlabels';
     $title = get_string('useassignlabels', 'format_qmultopics');
 //    $description = get_string('usethemebadges_desc', 'format_qmultopics');
@@ -36,4 +36,18 @@ if ($ADMIN->fulltree) {
         1 => new lang_string('yes')   // Yes.
     );
     $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+
+    if (get_config('format_qmultopics', 'useassignlabels')) {
+        /* Format assignemnt badges use caches - 0 = no, 1 = yes. */
+        $name = 'format_qmultopics/useassignlabelcaches';
+        $title = get_string('useassignlabelcaches', 'format_qmultopics');
+//    $description = get_string('usethemebadges_desc', 'format_qmultopics');
+        $description = get_string('useassignlabelcaches_desc', 'format_qmultopics');
+        $default = 0;
+        $choices = array(
+            0 => new lang_string('no'), // No.
+            1 => new lang_string('yes')   // Yes.
+        );
+        $settings->add(new admin_setting_configselect($name, $title, $description, $default, $choices));
+    }
 }

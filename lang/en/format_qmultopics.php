@@ -489,6 +489,8 @@ $string['usethemebadges'] = 'Use assignment badges from QMUL theme';
 $string['usethemebadges_desc'] = 'Switch to either use assignment badges provided by the course format or by the theme (in case the new format badges are affecting performance too much)';
 $string['useassignlabels'] = 'Use assignment labels';
 $string['useassignlabels_desc'] = 'If switched on labels will be shown for assignments on course pages';
+$string['useassignlabelcaches'] = 'Use caches for assignment label data';
+$string['useassignlabelcaches_desc'] = 'If switched on data used by assessment labels will be cached where possible to reduce database load. Changes to the module structure may show in assessment labels with some delay';
 
 // Cache strings.
 $string['cachedef_assignment_data'] = 'This is the assessment data cache used by assessment labels';

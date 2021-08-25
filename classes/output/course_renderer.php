@@ -392,7 +392,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         global $COURSE, $DB;
 
         $cache = cache::make('format_qmultopics', 'enrolled_users');
-        if (!$result = $cache->get($capability)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$result = $cache->get($capability)) {
             switch($capability) {
                 case 'assign':
                     $capability = 'mod/assign:submit';
@@ -1110,7 +1110,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'assignment_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1190,7 +1190,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_group_assignment_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
@@ -1242,7 +1242,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_assignment_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1310,7 +1310,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_assignment_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             uuid_short()
@@ -1356,7 +1356,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_group_assignment_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             uuid_short()
@@ -1402,7 +1402,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'choice_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1437,7 +1437,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_choice_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1475,7 +1475,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_choice_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1516,7 +1516,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'feedback_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1551,7 +1551,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_feedback_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1589,7 +1589,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_feedback_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1631,7 +1631,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'lesson_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1666,7 +1666,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_lesson_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1706,7 +1706,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_lesson_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             uuid_short()
@@ -1751,7 +1751,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'quiz_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1788,7 +1788,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'admin_quiz_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             cm.instance as moduleid
@@ -1827,7 +1827,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         $cache = cache::make('format_qmultopics', 'student_quiz_data');
-        if (!$data = $cache->get($courseid)) {
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
             uuid_short()
