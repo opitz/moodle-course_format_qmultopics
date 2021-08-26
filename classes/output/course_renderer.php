@@ -585,8 +585,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
     }
     public function show_assign_group_submissions($mod) {
-        global $CFG;
-
         // Show group submissions by enrolled students.
         $spacer = get_string('badge_commaspacer', 'format_qmultopics');
         $pretext = '';
@@ -601,8 +599,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $coursegroupsarray = [];
             $groupsubmissionsarray = [];
             $groupgradingsarray = [];
+            $default_group = 0;
             if (isset($this->group_assignment_data)) {
                 foreach ($this->group_assignment_data as $record) {
+                    // The default group is present only when a group assignment allows submissions by non-group members
+                    // or by users that are member of more than one group - so we need to add 1 to the number of groups
+                    if (!$default_group && !$record->preventsubmissionnotingroup) {
+                        $default_group = 1;
+                    }
+                    
                     $coursegroupsarray[$record->groupid] = $record->groupid;
                     if ($record->assignment == $mod->instance && $record->status == 'submitted') {
                         $groupsubmissionsarray[$record->groupid] = true;
@@ -612,7 +617,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     }
                 }
             }
-            $coursegroups = count($coursegroupsarray);
+            $coursegroups = count($coursegroupsarray) + $default_group;
             $groupsubmissions = count($groupsubmissionsarray);
             $groupgradings = count($groupgradingsarray);
             $ungraded = $groupsubmissions - $groupgradings;
@@ -1193,7 +1198,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
             $sql = "
             select
-            concat_ws('_', g.id,gm.id, asu.id, ag.id, gi.id, gg.id) as row_id
+            uuid_short() as row_id
             ,g.id
             ,gi.hidden as gi_hidden
             ,gi.locked as gi_locked
@@ -1205,9 +1210,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
             ,asu.assignment
             ,asu.status
             ,ag.grade
+            ,a.preventsubmissionnotingroup
             from {groups} g
             join {groups_members} gm on gm.groupid = g.id
             left join {assign_submission} asu on asu.groupid = g.id
+            left join {assign} a on a.id = asu.assignment 
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
             # grading
             left join {grade_items} gi on (gi.courseid = g.courseid
