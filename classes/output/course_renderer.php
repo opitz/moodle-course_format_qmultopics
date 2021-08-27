@@ -656,7 +656,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if ($enrolledstudents && isset($this->group_assignment_data) && $this->group_assignment_data[$mod->instance]) {
 
             $coursegroups = $this->group_assignment_data[$mod->instance]->groups;
-            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted;
+            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ? $this->group_assignment_data[$mod->instance]->submitted : 0;
             $groupgradings = $this->group_assignment_data[$mod->instance]->graded;
             $ungraded = $groupsubmissions - $groupgradings;
 
@@ -1290,7 +1290,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 join {modules} m on m.id = cm.module
                 join {groups} gr on gr.courseid = cm.course
                 join {assign} a on a.id = cm.instance and a.course = cm.course and a.teamsubmission = 1
-                join {assign_submission} asu on asu.assignment = a.id and asu.status = 'submitted'
+                left join {assign_submission} asu on asu.assignment = a.id and asu.status = 'submitted'
                 left join {groups} g on g.id = asu.groupid
                 left join {groups_members} gm on gm.groupid = g.id
                 left join {assign_grades} ag on ag.assignment = asu.assignment and ag.userid = gm.userid
