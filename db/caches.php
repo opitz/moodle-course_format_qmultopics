@@ -25,32 +25,32 @@ $definitions = array(
     'assignment_data' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'choice_data' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'feedback_data' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'lesson_data' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'quiz_data' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'enrolled_users' => array(
         'mode' => cache_store::MODE_APPLICATION,
         'staticacceleration' => true,
-        'ttl' => 3600
+        'ttl' => 300
     ),
     'admin_assignment_data' => array(
         'mode' => cache_store::MODE_SESSION,
