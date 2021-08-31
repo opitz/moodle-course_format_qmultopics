@@ -50,3 +50,7 @@ div.badge {
     padding: 5px;
     border-radius: 4px;
 }
+
+a.badge-danger {
+    color: white !important;
+}
