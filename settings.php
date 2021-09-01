@@ -28,7 +28,6 @@ if ($ADMIN->fulltree) {
     /* Format assignemnt badges - 0 = no, 1 = yes. */
     $name = 'format_qmultopics/useassignlabels';
     $title = get_string('useassignlabels', 'format_qmultopics');
-//    $description = get_string('usethemebadges_desc', 'format_qmultopics');
     $description = get_string('useassignlabels_desc', 'format_qmultopics');
     $default = 0;
     $choices = array(
@@ -41,7 +40,6 @@ if ($ADMIN->fulltree) {
         /* Format assignemnt badges use caches - 0 = no, 1 = yes. */
         $name = 'format_qmultopics/useassignlabelcaches';
         $title = get_string('useassignlabelcaches', 'format_qmultopics');
-//    $description = get_string('usethemebadges_desc', 'format_qmultopics');
         $description = get_string('useassignlabelcaches_desc', 'format_qmultopics');
         $default = 0;
         $choices = array(

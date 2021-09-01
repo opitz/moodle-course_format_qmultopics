@@ -204,7 +204,6 @@ class format_qmultopics extends format_topics2 {
                     'element_attributes' => array(
                         array(
                             COURSE_DISPLAY_SINGLEPAGE => new lang_string('coursedisplay_single'),
-//                            COURSE_DISPLAY_NOCOLLAPSE => get_string('coursedisplay_nocollapse', 'format_topics2'),
                             COURSE_DISPLAY_MULTIPAGE => new lang_string('coursedisplay_multi')
                         )
                     ),

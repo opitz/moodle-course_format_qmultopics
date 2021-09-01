@@ -35,7 +35,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $role = key($roles);
         $rolename = isset($roles[$role]) ? $roles[$role]->shortname : '';
 
-        // Get the module data sets for the current $COURSE
+        // Get the module data sets for the current $COURSE.
         $this->assignment_data = $this->get_assignment_data($COURSE->id);
         $this->choice_data = $this->get_choice_data($COURSE->id);
         $this->feedback_data = $this->get_feedback_data($COURSE->id);
@@ -43,40 +43,36 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $this->quiz_data = $this->get_quiz_data($COURSE->id);
 
         if ($rolename != 'student' || is_siteadmin()) {
-            // Pre-load the assessment label data for course admins
+            // Pre-load the assessment label data for course admins.
             $this->enrolled_students = $this->get_enrolled_students();
             // Assignment.
-            if (isset($this->enrolled_students['assign'])){
-                $studentids = implode("','",array_keys($this->enrolled_students['assign']));
-
+            if (isset($this->enrolled_students['assign'])) {
+                $studentids = implode("','", array_keys($this->enrolled_students['assign']));
                 $this->group_assignment_data = $this->get_group_assignment_data($COURSE->id);
                 $this->assignments_submitted = $this->get_assignments_submitted($COURSE->id, $studentids);
             }
             // Choice.
-            if (isset($this->enrolled_students['choice'])){
-                $studentids = implode("','",array_keys($this->enrolled_students['choice']));
-
+            if (isset($this->enrolled_students['choice'])) {
+                $studentids = implode("','", array_keys($this->enrolled_students['choice']));
                 $this->choice_answers = $this->get_choice_answers($COURSE->id, $studentids);
             }
             // Feedback.
-            if (isset($this->enrolled_students['feedback'])){
-                $studentids = implode("','",array_keys($this->enrolled_students['feedback']));
-
+            if (isset($this->enrolled_students['feedback'])) {
+                $studentids = implode("','", array_keys($this->enrolled_students['feedback']));
                 $this->feedback_completions = $this->get_feedback_completions($COURSE->id, $studentids);
             }
             // Lesson.
-            if (isset($this->enrolled_students['lesson'])){
-                $studentids = implode("','",array_keys($this->enrolled_students['lesson']));
+            if (isset($this->enrolled_students['lesson'])) {
+                $studentids = implode("','", array_keys($this->enrolled_students['lesson']));
                 $this->lesson_submissions = $this->get_lesson_submissions($COURSE->id, $studentids);
             }
             // Quiz.
-            if (isset($this->enrolled_students['quiz'])){
-                $studentids = implode("','",array_keys($this->enrolled_students['quiz']));
-
+            if (isset($this->enrolled_students['quiz'])) {
+                $studentids = implode("','", array_keys($this->enrolled_students['quiz']));
                 $this->quiz_submitted = $this->get_quiz_submitted($COURSE->id, $studentids);
             }
-        } else{
-            // Pre-load the assessment label data for a student
+        } else {
+            // Pre-load the assessment label data for a student.
             // Assignment.
             $this->assignments_graded = $this->get_student_assignments_graded($COURSE->id, $USER->id);
             $this->group_assignments_graded = $this->get_student_group_assignments_graded($COURSE->id, $USER->id);
@@ -130,13 +126,16 @@ class qmultopics_course_renderer extends \core_course_renderer{
      */
     public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
         $output = '';
-        // We return empty string (because course module will not be displayed at all)
-        // if:
-        // 1) The activity is not visible to users
-        // and
-        // 2) The 'availableinfo' is empty, i.e. the activity was
-        //     hidden in a way that leaves no info, such as using the
-        //     eye icon.
+
+        /**
+         * We return empty string (because course module will not be displayed at all)
+         * if:
+         * 1) The activity is not visible to users
+         * and
+         * 2) The 'availableinfo' is empty, i.e. the activity was
+         *     hidden in a way that leaves no info, such as using the
+         *     eye icon.
+         */
         if (!$mod->is_visible_on_course_page()) {
             return $output;
         }
@@ -155,14 +154,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
-        // For some reason the 'w-100' class causes the module titles to be intended randomly(?)
-        // when the QMUL themes are installed
-        // For this reason it is disabled here and replaced by a width applied to the indent div below.
-        //$output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
+        /**
+         * For some reason the 'w-100' class causes the module titles to be intended randomly(?)
+         * when the QMUL themes are installed
+         * For this reason it is disabled here and replaced by a width applied to the indent div below.
+         * $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
+         */
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
-        //$output .= html_writer::div('', $indentclasses);
         $output .= html_writer::div('', $indentclasses, ['style' => 'width: 10px;']);
 
         // Start a wrapper for the actual content to keep the indentation consistent
@@ -176,19 +176,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= html_writer::start_tag('div', array('class' => 'activityinstance'));
             $output .= $cmname;
 
-            // Module can put text after the link (e.g. forum unread)
+            // Module can put text after the link (e.g. forum unread).
             $output .= $mod->afterlink;
 
-            // Closing the tag which contains everything but edit icons. Content part of the module should not be part of this.
-            $output .= html_writer::end_tag('div'); // .activityinstance
+            /**
+             * Closing the tag which contains everything but edit icons.
+             * Content part of the module should not be part of this.
+             */
+            $output .= html_writer::end_tag('div');
         }
 
-        // If there is content but NO link (eg label), then display the
-        // content here (BEFORE any icons). In this case cons must be
-        // displayed after the content so that it makes more sense visually
-        // and for accessibility reasons, e.g. if you have a one-line label
-        // it should work similarly (at least in terms of ordering) to an
-        // activity.
+        /**
+         * If there is content but NO link (eg label), then display the
+         * content here (BEFORE any icons). In this case cons must be
+         * displayed after the content so that it makes more sense visually
+         * and for accessibility reasons, e.g. if you have a one-line label
+         * it should work similarly (at least in terms of ordering) to an
+         * activity.
+         */
         $contentpart = $this->course_section_cm_text($mod, $displayoptions);
         $url = $mod->url;
         if (empty($url)) {
@@ -211,18 +216,20 @@ class qmultopics_course_renderer extends \core_course_renderer{
         // Show availability info (if module is not available).
         $output .= $this->course_section_cm_availability($mod, $displayoptions);
 
-        // If there is content AND a link, then display the content here
-        // (AFTER any icons). Otherwise it was displayed before
+        /**
+         * If there is content AND a link, then display the content here
+         * (AFTER any icons). Otherwise it was displayed before.
+         */
         if (!empty($url)) {
             $output .= $contentpart;
         }
 
-        // Amending badges
+        // Amending badges.
         $output .= html_writer::start_div();
         $output .= $this->show_labels($mod);
         $output .= html_writer::end_div();
 
-        $output .= html_writer::end_tag('div'); // $indentclasses
+        $output .= html_writer::end_tag('div');
 
         // End of indentation div.
         $output .= html_writer::end_tag('div');
@@ -278,24 +285,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $badgeclass = 'badge-default';
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
-        $today = new DateTime(); // This object represents current date/time
-        $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+        $today = new DateTime(); // This object represents current date/time.
+        $today->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-        $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$duedate ));
-        $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+        $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$duedate ));
+        $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-        $diff = $today->diff( $match_date );
-        $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+        $diff = $today->diff( $matchdate );
+        $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
         switch( true ) {
             case $diffdays == 0:
                 $badgeclass = ' badge-danger';
                 if ($cutoffdate > 0 && $duedate < time()) {
-                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
-                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-                    $diff = $today->diff( $match_date );
-                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+                    $diff = $today->diff( $matchdate );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
                     switch( true ) {
                         case $diffdays == 0:
@@ -309,7 +316,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                             $badgedate = $cutoffdate;
                             break;
                     }
-                } elseif ($duedate < time()) {
+                } else if ($duedate < time()) {
                     $dateformat = "%d %B %Y %H:%M:%S";
                     $duetext = get_string('label_wasdue', 'format_qmultopics');
                 } else {
@@ -318,11 +325,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 break;
             case $diffdays < 0:
                 if ($cutoffdate > 0) {
-                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
-                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $cutoffdate ));
+                    $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-                    $diff = $today->diff( $match_date );
-                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+                    $diff = $today->diff( $matchdate );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
                     switch( true ) {
                         case $diffdays == 0:
@@ -350,10 +357,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             default:
                 $duetext = get_string('label_due', 'format_qmultopics');
         }
-
-
         $badgecontent = $duetext . userdate($badgedate, $dateformat);
-        return $this->html_label($badgecontent, $badgeclass,'', $url);
+        return $this->html_label($badgecontent, $badgeclass, '', $url);
     }
 
     /**
@@ -441,9 +446,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $o = '';
         if (isset($this->assignment_data[$mod->instance])) {
             // Show assignment due date if it has one.
-            $o .= $this->show_due_date_label($mod, $this->assignment_data[$mod->instance]->duedate, $this->assignment_data[$mod->instance]->cutoffdate);
+            $o .= $this->show_due_date_label($mod, $this->assignment_data[$mod->instance]->duedate,
+                $this->assignment_data[$mod->instance]->cutoffdate);
 
-            // Create an assign object to receive submission data
+            // Create an assign object to receive submission data.
             $context = context_module::instance($mod->id);
             $assign = new assign($context, $mod, $COURSE);
             $activitygroup = false;
@@ -452,7 +458,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             if (has_capability('mod/assign:grade', $mod->context)) {
                 // Show submission numbers and ungraded submissions if any.
                 // Check if the assignment allows group submissions.
-                if ($this->assignment_data[$mod->instance]->teamsubmission && ! $this->assignment_data[$mod->instance]->requireallteammemberssubmit) {
+                if ($this->assignment_data[$mod->instance]->teamsubmission &&
+                    !$this->assignment_data[$mod->instance]->requireallteammemberssubmit) {
                     $this->teams = $assign->count_teams($activitygroup);
                     $o .= $this->show_assign_group_submissions($mod);
                 } else {
@@ -547,7 +554,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $groupstext = get_string('label_groups', 'format_qmultopics');
         $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
         $enrolledstudents = $this->enrolled_users('assign');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.
+            $mod->id.'&tsort=timesubmitted&filter=require_grading';
         if ($enrolledstudents) {
             // Go through the group_data to get numbers for groups, submissions and gradings.
             $coursegroupsarray = [];
@@ -584,7 +592,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_label($badgetext,'','',$url);
+                return $this->html_label($badgetext, '', '', $url);
             } else {
                 return '';
             }
@@ -605,13 +613,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $coursegroupsarray = [];
             $groupsubmissionsarray = [];
             $groupgradingsarray = [];
-            $default_group = 0;
+            $defaultgroup = 0;
             if (isset($this->group_assignment_data)) {
                 foreach ($this->group_assignment_data as $record) {
-                    // The default group is present only when a group assignment allows submissions by non-group members
-                    // or by users that are member of more than one group - so we need to add 1 to the number of groups
-                    if (!$default_group && !$record->preventsubmissionnotingroup) {
-                        $default_group = 1;
+                    /**
+                     * The default group is present only when a group assignment allows submissions by non-group members
+                     * or by users that are member of more than one group - so we need to add 1 to the number of groups
+                     */
+                    if (!$defaultgroup && !$record->preventsubmissionnotingroup) {
+                        $defaultgroup = 1;
                     }
 
                     $coursegroupsarray[$record->groupid] = $record->groupid;
@@ -623,7 +633,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     }
                 }
             }
-            $coursegroups = count($coursegroupsarray) + $default_group;
+            $coursegroups = count($coursegroupsarray) + $defaultgroup;
             $groupsubmissions = count($groupsubmissionsarray);
             $groupgradings = count($groupgradingsarray);
             $ungraded = $groupsubmissions - $groupgradings;
@@ -684,7 +694,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_label($badgetext,'','',$url);
+                return $this->html_label($badgetext, '', '', $url);
             } else {
                 return '';
             }
@@ -704,9 +714,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         if ($enrolledstudents && isset($this->group_assignment_data) && $this->group_assignment_data[$mod->instance]) {
 
-//            $coursegroups = $this->group_assignment_data[$mod->instance]->groups;
             $coursegroups = $this->teams;
-            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ? $this->group_assignment_data[$mod->instance]->submitted : 0;
+            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ?
+                $this->group_assignment_data[$mod->instance]->submitted : 0;
             $groupgradings = $this->group_assignment_data[$mod->instance]->graded;
             $ungraded = $groupsubmissions - $groupgradings;
 
@@ -726,7 +736,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_label($badgetext,'','',$url);
+                return $this->html_label($badgetext, '', '', $url);
             } else {
                 return '';
             }
@@ -742,28 +752,22 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_assign_submission($mod) {
-//        global $CFG, $COURSE, $USER;
-
-//        $context = context_module::instance($mod->id);
-//        $assign = new assign($context, $mod, $COURSE);
-//        $user_submission = $assign->get_user_submission($USER->id, false);
-        $user_submission = $this->user_submission;
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         $badgetitle = '';
         $dateformat = "%d %B %Y";
         $timeformat = "%d %B %Y %H:%M:%S";
 
-        if (!isset($user_submission->status) || $user_submission->status != 'submitted') {
+        if (!isset($this->user_submission->status) || $this->user_submission->status != 'submitted') {
             $badgetext = get_string('label_notsubmitted', 'format_qmultopics');
         } else {
             $badgetext = get_string('label_submitted',
-                    'format_qmultopics').userdate($user_submission->timemodified, $dateformat);
+                    'format_qmultopics').userdate($this->user_submission->timemodified, $dateformat);
             if ($this->get_grading($mod) || $this->get_group_grading($mod)) {
                 $badgetext .= get_string('label_feedback', 'format_qmultopics');
             }
             $badgetitle = get_string('label_submission_time_title',
-                    'format_qmultopics') . userdate($user_submission->timemodified, $timeformat);
+                    'format_qmultopics') . userdate($this->user_submission->timemodified, $timeformat);
         }
         return $this->html_label($badgetext, '', $badgetitle, $url);
     }
@@ -863,7 +867,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $posttext = get_string('label_answered', 'format_qmultopics');
         $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         // Get the number of submissions for this module.
-        if (!isset($this->choice_answers[$mod->instance]->submitted) || !$submissions = $this->choice_answers[$mod->instance]->submitted) {
+        if (!isset($this->choice_answers[$mod->instance]->submitted) ||
+            !$submissions = $this->choice_answers[$mod->instance]->submitted) {
             $submissions = 0;
         }
         $badgetext = $pretext
@@ -871,7 +876,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .$xofy
             .count($enrolledstudents)
             .$posttext;
-        return $this->html_label($badgetext,'','',$url);
+        return $this->html_label($badgetext, '', '', $url);
     }
 
     /**
@@ -887,13 +892,14 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
-        if (isset($this->choice_answers[$mod->instance]->submit_time) && $submittime = $this->choice_answers[$mod->instance]->submit_time) {
+        if (isset($this->choice_answers[$mod->instance]->submit_time) &&
+            $submittime = $this->choice_answers[$mod->instance]->submit_time) {
             $badgetext = get_string('label_answered',
                     'format_qmultopics').userdate($submittime, $dateformat);
         } else {
             $badgetext = get_string('label_notanswered', 'format_qmultopics');
         }
-        return $this->html_label($badgetext,'','',$url);
+        return $this->html_label($badgetext, '', '', $url);
     }
 
     // Feedbacks.
@@ -953,7 +959,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .$xofy
             .count($enrolledstudents)
             .$posttext;
-        return $this->html_label($badgetext,'','',$url);
+        return $this->html_label($badgetext, '', '', $url);
     }
 
     /**
@@ -968,13 +974,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
-        if (isset($this->feedback_completions[$mod->instance]->completed) && $submission = $this->feedback_completions[$mod->instance]->completed) {
+        if (isset($this->feedback_completions[$mod->instance]->completed) &&
+            $submission = $this->feedback_completions[$mod->instance]->completed) {
             $badgetext = get_string('label_completed',
-                    'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time, $dateformat);
+                    'format_qmultopics').userdate($this->feedback_completions[$mod->instance]->submit_time,
+                    $dateformat);
         } else {
             $badgetext = get_string('label_notcompleted', 'format_qmultopics');
         }
-        return $this->html_label($badgetext,'','',$url);
+        return $this->html_label($badgetext, '', '', $url);
     }
 
     // Lessons.
@@ -1032,7 +1040,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if (!$submissions = $this->lesson_submissions[$mod->instance]->submitted) {
             $submissions = 0;
         }
-        // Get the number of completed submissions for this module
+        // Get the number of completed submissions for this module.
         if (!$completed = $this->lesson_submissions[$mod->instance]->completed) {
             $completed = 0;
         }
@@ -1050,7 +1058,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 .$completed
                 .$completedtext;
         }
-        return $this->html_label($badgetext,'','',$url);
+        return $this->html_label($badgetext, '', '', $url);
     }
 
     /**
@@ -1068,20 +1076,22 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
         foreach ($this->lesson_submissions as $submission) {
-            if($submission->moduleid == $mod->instance) {
+            if ($submission->moduleid == $mod->instance) {
                 if (isset($submission->completed) && $submission->completed) {
-                    $o .=  $this->html_label(get_string('label_completed',
-                            'format_qmultopics').userdate($submission->completed, $dateformat),'','',$url);
+                    $o .= $this->html_label(get_string('label_completed',
+                            'format_qmultopics').userdate($submission->completed, $dateformat),
+                        '', '', $url);
                 } else {
                     $o .= $this->html_label(get_string('label_attempted',
-                            'format_qmultopics').userdate($submission->submit_time, $dateformat),'','',$url);
+                            'format_qmultopics').userdate($submission->submit_time, $dateformat),
+                        '', '', $url);
                 }
             }
         }
         if ($o != '') {
             return $o;
         }
-        return $this->html_label(get_string('label_notcompleted', 'format_qmultopics'),'','',$url);
+        return $this->html_label(get_string('label_notcompleted', 'format_qmultopics'), '', '', $url);
     }
 
     // Quizzes.
@@ -1134,11 +1144,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         // Get the number of submissions for this module.
-        if (!isset($this->quiz_submitted[$mod->instance]->submitted) || !$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
+        if (!isset($this->quiz_submitted[$mod->instance]->submitted) ||
+            !$submissions = $this->quiz_submitted[$mod->instance]->submitted) {
             $submissions = 0;
         }
-        // Get the number of finished submissions for this module
-        if (!isset($this->quiz_submitted[$mod->instance]->finished) || !$finished = $this->quiz_submitted[$mod->instance]->finished) {
+        // Get the number of finished submissions for this module.
+        if (!isset($this->quiz_submitted[$mod->instance]->finished) ||
+            !$finished = $this->quiz_submitted[$mod->instance]->finished) {
             $finished = 0;
         }
         $badgetext = $pretext
@@ -1171,11 +1183,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
                     switch($submission->state) {
                         case "inprogress":
                             $o .= $this->html_label(get_string('label_inprogress',
-                                    'format_qmultopics').userdate($submission->timestart, $dateformat),'','',$url);
+                                    'format_qmultopics').userdate($submission->timestart, $dateformat),
+                                '', '', $url);
                             break;
                         case "finished":
                             $o .= $this->html_label(get_string('label_finished',
-                                    'format_qmultopics').userdate($submission->submit_time, $dateformat),'','',$url);
+                                    'format_qmultopics').userdate($submission->submit_time, $dateformat),
+                                '', '', $url);
                             break;
                     }
                 }
@@ -1184,10 +1198,12 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if ($o != '') {
             return $o;
         }
-        return $this->html_label(get_string('label_notattempted', 'format_qmultopics'),'','',$url);
+        return $this->html_label(get_string('label_notattempted', 'format_qmultopics'), '', '', $url);
     }
 
-    //==================================================================================================================
+    /**
+     * =================================================================================================================
+     */
 
     /**
      * Get information about all assignment assessments of a given course
