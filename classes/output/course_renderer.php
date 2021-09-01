@@ -156,6 +156,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         // when the QMUL themes are installed
         // For this reason it is disabled here and replaced by a width applied to the indent div below.
         // $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
+        // the end.
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
@@ -1310,7 +1311,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             from {groups} g
             join {groups_members} gm on gm.groupid = g.id
             left join {assign_submission} asu on asu.groupid = g.id
-            left join {assign} a on a.id = asu.assignment 
+            left join {assign} a on a.id = asu.assignment
             left join {assign_grades} ag on (ag.assignment = asu.assignment and ag.userid = gm.userid)
             # grading
             left join {grade_items} gi on (gi.courseid = g.courseid
@@ -1513,7 +1514,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {grade_items} gi on (gi.courseid = g.courseid
                 and gi.itemmodule = 'assign' and gi.iteminstance = asu.assignment)
             join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = gm.userid)
-            where g.courseid = $courseid 
+            where g.courseid = $courseid
             and asu.userid = 0
             and gm.userid = $studentid
             ";
