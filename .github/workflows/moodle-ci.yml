@@ -27,8 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['7.3', '7.4', '8.0']
-        moodle-branch: ['MOODLE_311_STABLE']
+        php: ['7.2', '7.4']
+        moodle-branch: ['MOODLE_39_STABLE']
         database: [pgsql, mariadb]
 
     steps:
@@ -96,10 +96,6 @@ jobs:
       - name: Grunt
         if: ${{ always() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
-
-      - name: PHPUnit tests
-        if: ${{ always() }}
-        run: moodle-plugin-ci phpunit
 
       - name: Behat features
         if: ${{ always() }}
