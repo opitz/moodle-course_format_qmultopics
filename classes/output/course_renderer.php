@@ -127,15 +127,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
         $output = '';
 
-        /**
-         * We return empty string (because course module will not be displayed at all)
-         * if:
-         * 1) The activity is not visible to users
-         * and
-         * 2) The 'availableinfo' is empty, i.e. the activity was
-         *     hidden in a way that leaves no info, such as using the
-         *     eye icon.
-         */
+        // We return empty string (because course module will not be displayed at all)
+        // if:
+        // 1) The activity is not visible to users
+        // and
+        // 2) The 'availableinfo' is empty, i.e. the activity was
+        // hidden in a way that leaves no info, such as using the
+        // eye icon.
         if (!$mod->is_visible_on_course_page()) {
             return $output;
         }
@@ -154,21 +152,19 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= course_get_cm_move($mod, $sectionreturn);
         }
 
-        /**
-         * For some reason the 'w-100' class causes the module titles to be intended randomly(?)
-         * when the QMUL themes are installed
-         * For this reason it is disabled here and replaced by a width applied to the indent div below.
-         * $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
-         */
+        // For some reason the 'w-100' class causes the module titles to be intended randomly(?)
+        // when the QMUL themes are installed
+        // For this reason it is disabled here and replaced by a width applied to the indent div below.
+        // $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer w-100'));
         $output .= html_writer::start_tag('div', array('class' => 'mod-indent-outer'));
 
         // This div is used to indent the content.
         $output .= html_writer::div('', $indentclasses, ['style' => 'width: 10px;']);
 
-        // Start a wrapper for the actual content to keep the indentation consistent
+        // Start a wrapper for the actual content to keep the indentation consistent.
         $output .= html_writer::start_tag('div');
 
-        // Display the link to the module (or do nothing if module has no url)
+        // Display the link to the module (or do nothing if module has no url).
         $cmname = $this->course_section_cm_name($mod, $displayoptions);
 
         if (!empty($cmname)) {
@@ -179,21 +175,17 @@ class qmultopics_course_renderer extends \core_course_renderer{
             // Module can put text after the link (e.g. forum unread).
             $output .= $mod->afterlink;
 
-            /**
-             * Closing the tag which contains everything but edit icons.
-             * Content part of the module should not be part of this.
-             */
+            // Closing the tag which contains everything but edit icons.
+            // Content part of the module should not be part of this.
             $output .= html_writer::end_tag('div');
         }
 
-        /**
-         * If there is content but NO link (eg label), then display the
-         * content here (BEFORE any icons). In this case cons must be
-         * displayed after the content so that it makes more sense visually
-         * and for accessibility reasons, e.g. if you have a one-line label
-         * it should work similarly (at least in terms of ordering) to an
-         * activity.
-         */
+        // If there is content but NO link (eg label), then display the
+        // content here (BEFORE any icons). In this case cons must be
+        // displayed after the content so that it makes more sense visually
+        // and for accessibility reasons, e.g. if you have a one-line label
+        // it should work similarly (at least in terms of ordering) to an
+        // activity.
         $contentpart = $this->course_section_cm_text($mod, $displayoptions);
         $url = $mod->url;
         if (empty($url)) {
@@ -216,10 +208,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         // Show availability info (if module is not available).
         $output .= $this->course_section_cm_availability($mod, $displayoptions);
 
-        /**
-         * If there is content AND a link, then display the content here
-         * (AFTER any icons). Otherwise it was displayed before.
-         */
+        // If there is content AND a link, then display the content here (AFTER any icons).
+        // Otherwise it was displayed before.
         if (!empty($url)) {
             $output .= $contentpart;
         }
@@ -288,7 +278,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $today = new DateTime(); // This object represents current date/time.
         $today->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-        $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$duedate ));
+        $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $duedate ));
         $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
         $diff = $today->diff( $matchdate );
@@ -298,7 +288,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             case $diffdays == 0:
                 $badgeclass = ' badge-danger';
                 if ($cutoffdate > 0 && $duedate < time()) {
-                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $cutoffdate ));
                     $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
                     $diff = $today->diff( $matchdate );
@@ -616,10 +606,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $defaultgroup = 0;
             if (isset($this->group_assignment_data)) {
                 foreach ($this->group_assignment_data as $record) {
-                    /**
-                     * The default group is present only when a group assignment allows submissions by non-group members
-                     * or by users that are member of more than one group - so we need to add 1 to the number of groups
-                     */
+                    // The default group is present only when a group assignment allows submissions by non-group members
+                    // or by users that are member of more than one group - so we need to add 1 to the number of groups.
                     if (!$defaultgroup && !$record->preventsubmissionnotingroup) {
                         $defaultgroup = 1;
                     }
@@ -653,7 +641,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             }
 
             if ($badgetext) {
-                return $this->html_label($badgetext,'','',$url);
+                return $this->html_label($badgetext, '', '', $url);
             } else {
                 return '';
             }
@@ -674,7 +662,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         if ($enrolledstudents && isset($this->group_assignment_data) && $this->group_assignment_data[$mod->instance]) {
 
             $coursegroups = $this->group_assignment_data[$mod->instance]->groups;
-            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ? $this->group_assignment_data[$mod->instance]->submitted : 0;
+            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ?
+                $this->group_assignment_data[$mod->instance]->submitted : 0;
             $groupgradings = $this->group_assignment_data[$mod->instance]->graded;
             $ungraded = $groupsubmissions - $groupgradings;
 
@@ -1658,8 +1647,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_feedback_data($courseid)
-    {
+    protected function get_feedback_data($courseid) {
         global $DB;
 
         // Check if $courseid is actually a course object and if so get the ID.
@@ -1773,8 +1761,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_lesson_data($courseid)
-    {
+    protected function get_lesson_data($courseid) {
         global $DB;
 
         // Check if $courseid is actually a course object and if so get the ID.
@@ -1893,8 +1880,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_quiz_data($courseid)
-    {
+    protected function get_quiz_data($courseid) {
         global $DB;
 
         // Check if $courseid is actually a course object and if so get the ID.
@@ -1907,7 +1893,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $sql = "
             select
             cm.instance as moduleid
-            ,q.timeclose as duedate 
+            ,q.timeclose as duedate
             #,cm.id
             from {course_modules} cm
             join {modules} m on m.id = cm.module
