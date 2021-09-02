@@ -37,8 +37,8 @@ require_once($CFG->dirroot . '/course/format/topics2/renderer.php');
  */
 class format_qmultopics_renderer extends format_topics2_renderer {
 
-    private $courseformat = null;
-    private $tcsettings;
+    protected  $courseformat = null;
+    protected $tcsettings;
 
     /**
      * format_qmultopics_renderer constructor.

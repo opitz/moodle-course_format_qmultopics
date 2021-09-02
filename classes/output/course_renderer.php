@@ -22,7 +22,6 @@ require_once($CFG->dirroot . '/course/renderer.php');
  *
  * @package format_qmultopics
  */
-
 class qmultopics_course_renderer extends \core_course_renderer{
 
     /**

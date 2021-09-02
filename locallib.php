@@ -15,6 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Local library for format_qmultopics
+ *
  * @package    format_qmultopics
  * @copyright  2020 Matthias Opitz
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
