@@ -1707,7 +1707,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    protected function get_student_quiz_submitted(int $courseid, int $studentid) {
+    protected function get_student_quiz_submitted($courseid, $studentid) {
         global $DB;
 
         // Check if $courseid is actually a course object and if so get the ID.
