@@ -44,7 +44,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * format_qmultopics_renderer constructor.
      *
      * @param moodle_page $page
-     * @param $target
+     * @param stdClass $target
      * @throws dml_exception
      */
     public function __construct(moodle_page $page, $target) {
@@ -236,7 +236,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     /**
      * Get the content for the assessment information section
      *
-     * @param $content
+     * @param stdClass $content
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -458,7 +458,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     /**
      * Render an extratab
      *
-     * @param $tab
+     * @param stdClass $tab
      * @return string
      * @throws coding_exception
      * @throws dml_exception

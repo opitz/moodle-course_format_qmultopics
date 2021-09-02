@@ -40,6 +40,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @package    format_qmultopics
+ * @copyright  2020 Matthias Opitz
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/format/qmultopics/lib.php');
 
@@ -69,7 +75,7 @@ class restore_format_qmultopics_plugin extends restore_format_plugin {
      * the 'course.xml' file in the '/course' folder
      * of the zipped backup 'mbz' file.
      *
-     * @param $data
+     * @param stdClass $data
      * @throws dml_exception
      */
     public function process_format_qmultopics($data) {

@@ -34,7 +34,6 @@ class format_qmultopics extends format_topics2 {
 
     /**
      * Adds format options elements to the course/section edit form
-     * This function is called from {@link course_edit_form::definition_after_data()}
      *
      * @param MoodleQuickForm $mform
      * @param bool $forsection
