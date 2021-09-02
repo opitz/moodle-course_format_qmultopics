@@ -245,7 +245,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show a badge for the given module
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -275,7 +275,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show a due date label
      *
-     * @param $duedate
+     * @param stdClass $duedate
      * @return string
      * @throws coding_exception
      */
@@ -368,7 +368,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Return the html for a badge
      *
-     * @param $badgetext
+     * @param stdClass $badgetext
      * @param string $badgeclass
      * @param string $title
      * @return string
@@ -390,8 +390,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get a list of IDs of enrolled users of a course with the given capability
      *
-     * @param $courseid
-     * @param $capability
+     * @param stdClass $courseid
+     * @param stdClass $capability
      * @return array
      * @throws dml_exception
      */
@@ -436,7 +436,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge for assign plus additional due date badge
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -478,7 +478,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with submissions and gradings for all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -537,7 +537,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with submissions and gradings for all groups
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -588,7 +588,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * A badge to show the student her/his submission status
      * It will display the date of a submission, a mouseover will show the time for the submission
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -616,7 +616,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Return true if the given student has been graded yet and the grading is neither hidden nor locked
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return array
      */
     protected function get_grading($mod) {
@@ -638,7 +638,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * Return true if the submission of the group of which the given student is a member has already been graded
      * and the grading is neither hidden nor locked.
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return bool
      */
     protected function get_group_grading($mod) {
@@ -664,7 +664,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge for choice plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -692,7 +692,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with choice answers of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -723,7 +723,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show choice answer for current student
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -746,7 +746,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show feedback badge plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -772,7 +772,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with feedback completions of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -803,7 +803,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show feedback by current student
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -826,7 +826,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show lesson badge plus additional due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -853,7 +853,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with lesson attempts of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -899,7 +899,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show lesson attempt for the current student
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -932,7 +932,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Quiz badge plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -959,7 +959,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show quiz attempts and finished ones of all students.
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -1012,7 +1012,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show quiz attempts for the current student
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -1052,7 +1052,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all assignment assessments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1090,7 +1090,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all group assignments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array
      * @throws dml_exception
      */
@@ -1136,8 +1136,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get submission and grading numbers by a list of students for all assignments of a given course
      *
-     * @param $courseid
-     * @param $studentids
+     * @param stdClass $courseid
+     * @param stdClass $studentids
      * @return array
      * @throws dml_exception
      */
@@ -1179,8 +1179,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get all graded assignments of a given course and student
      *
-     * @param $courseid
-     * @param $studentid
+     * @param stdClass $courseid
+     * @param stdClass $studentid
      * @return array
      * @throws dml_exception
      */
@@ -1225,8 +1225,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get all graded group assignments of a given course and student
      *
-     * @param $courseid
-     * @param $studentid
+     * @param stdClass $courseid
+     * @param stdClass $studentid
      * @return array
      * @throws dml_exception
      */
@@ -1271,7 +1271,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all choice assessments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1306,8 +1306,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get choice answer numbers for a list of students for all assignments of a given course
      *
-     * @param $courseid
-     * @param $studentids
+     * @param stdClass $courseid
+     * @param stdClass $studentids
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1345,8 +1345,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the choice answers for a given course and user
      *
-     * @param $courseid
-     * @param $studentid
+     * @param stdClass $courseid
+     * @param stdClass $studentid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1386,7 +1386,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all feedback assessments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1421,8 +1421,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the number of completions by a given list of students for all feedback assessments of a given course
      *
-     * @param $courseid
-     * @param $studentids
+     * @param stdClass $courseid
+     * @param stdClass $studentids
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1460,8 +1460,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the completions for all feedbacks of a given student and course
      *
-     * @param $courseid
-     * @param $studentid
+     * @param stdClass $courseid
+     * @param stdClass $studentid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1502,7 +1502,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all lesson assessments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1537,8 +1537,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the number of submissions of a list of given students for all lessons of a given course
      *
-     * @param $courseid
-     * @param $studentids
+     * @param stdClass $courseid
+     * @param stdClass $studentids
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1578,8 +1578,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the submissions for all lessons of a given course and student
      *
-     * @param $courseid
-     * @param $studentid
+     * @param stdClass $courseid
+     * @param stdClass $studentid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1623,7 +1623,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get information about all quiz assessments of a given course
      *
-     * @param $courseid
+     * @param stdClass $courseid
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
@@ -1660,8 +1660,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the number of submissions of a list of given students for all quizzes of a given course
      *
-     * @param $courseid
-     * @param $studentids
+     * @param stdClass $courseid
+     * @param stdClass $studentids
      * @return array|bool|float|int|mixed|string
      * @throws coding_exception
      * @throws dml_exception
