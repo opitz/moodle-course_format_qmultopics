@@ -474,8 +474,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_assign_submissions($mod) {
-        global $CFG;
-
         // Show submissions by enrolled students.
         $spacer = get_string('label_commaspacer', 'format_qmultopics');
         $pretext = '';
@@ -534,164 +532,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      * @throws dml_exception
      */
-    public function show_assign_group_submissions0($mod) {
-        global $CFG;
-
-        // Show group submissions by enrolled students.
-        $spacer = get_string('label_commaspacer', 'format_qmultopics');
-        $pretext = '';
-        $xofy = get_string('label_xofy', 'format_qmultopics');
-        $posttext = get_string('label_submitted', 'format_qmultopics');
-        $groupstext = get_string('label_groups', 'format_qmultopics');
-        $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
-        $enrolledstudents = $this->enrolled_users('assign');
-        $url = $CFG->baseurl.'/mod/'.$mod->modname.'/view.php?action=grading&id='.
-            $mod->id.'&tsort=timesubmitted&filter=require_grading';
-        if ($enrolledstudents) {
-            // Go through the group_data to get numbers for groups, submissions and gradings.
-            $coursegroupsarray = [];
-            $groupsubmissionsarray = [];
-            $groupgradingsarray = [];
-            if (isset($this->group_assignment_data)) {
-                foreach ($this->group_assignment_data as $record) {
-                    $coursegroupsarray[$record->groupid] = $record->groupid;
-                    if ($record->assignment == $mod->instance && $record->status == 'submitted') {
-                        $groupsubmissionsarray[$record->groupid] = true;
-                        if ($record->grade > 0) {
-                            $groupgradingsarray[$record->groupid] = $record->grade;
-                        }
-                    }
-                }
-            }
-            $coursegroups = count($coursegroupsarray);
-            $groupsubmissions = count($groupsubmissionsarray);
-            $groupgradings = count($groupgradingsarray);
-            $ungraded = $groupsubmissions - $groupgradings;
-            $badgetext = $pretext
-                .$groupsubmissions
-                .$xofy
-                .$coursegroups
-                .$groupstext
-                .$posttext;
-            // If there are ungraded submissions show that in the badge as well.
-            if ($ungraded) {
-                $badgetext =
-                    $badgetext
-                    .$spacer
-                    .$ungraded
-                    .$ungradedtext;
-            }
-
-            if ($badgetext) {
-                return $this->html_label($badgetext, '', '', $url);
-            } else {
-                return '';
-            }
-        }
-    }
-    public function show_assign_group_submissions1($mod) {
-        // Show group submissions by enrolled students.
-        $spacer = get_string('label_commaspacer', 'format_qmultopics');
-        $pretext = '';
-        $xofy = get_string('label_xofy', 'format_qmultopics');
-        $posttext = get_string('label_submitted', 'format_qmultopics');
-        $groupstext = get_string('label_groups', 'format_qmultopics');
-        $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
-        $enrolledstudents = $this->enrolled_users('assign');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
-        if ($enrolledstudents) {
-            // Go through the group_data to get numbers for groups, submissions and gradings.
-            $coursegroupsarray = [];
-            $groupsubmissionsarray = [];
-            $groupgradingsarray = [];
-            $defaultgroup = 0;
-            if (isset($this->group_assignment_data)) {
-                foreach ($this->group_assignment_data as $record) {
-                    // The default group is present only when a group assignment allows submissions by non-group members
-                    // or by users that are member of more than one group - so we need to add 1 to the number of groups.
-                    if (!$defaultgroup && !$record->preventsubmissionnotingroup) {
-                        $defaultgroup = 1;
-                    }
-
-                    $coursegroupsarray[$record->groupid] = $record->groupid;
-                    if ($record->assignment == $mod->instance && $record->status == 'submitted') {
-                        $groupsubmissionsarray[$record->groupid] = true;
-                        if ($record->grade > 0) {
-                            $groupgradingsarray[$record->groupid] = $record->grade;
-                        }
-                    }
-                }
-            }
-            $coursegroups = count($coursegroupsarray) + $defaultgroup;
-            $groupsubmissions = count($groupsubmissionsarray);
-            $groupgradings = count($groupgradingsarray);
-            $ungraded = $groupsubmissions - $groupgradings;
-            $badgetext = $pretext
-                .$groupsubmissions
-                .$xofy
-                .$coursegroups
-                .$groupstext
-                .$posttext;
-            // If there are ungraded submissions show that in the badge as well.
-            if ($ungraded) {
-                $badgetext =
-                    $badgetext
-                    .$spacer
-                    .$ungraded
-                    .$ungradedtext;
-            }
-
-            if ($badgetext) {
-                return $this->html_label($badgetext, '', '', $url);
-            } else {
-                return '';
-            }
-        }
-    }
-    public function show_assign_group_submissions2($mod) {
-        global $COURSE;
-        // Show group submissions by enrolled students.
-        $spacer = get_string('label_commaspacer', 'format_qmultopics');
-        $pretext = '';
-        $xofy = get_string('label_xofy', 'format_qmultopics');
-        $posttext = get_string('label_submitted', 'format_qmultopics');
-        $groupstext = get_string('label_groups', 'format_qmultopics');
-        $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
-        $enrolledstudents = $this->enrolled_users('assign');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
-
-        if ($enrolledstudents && isset($this->group_assignment_data) && $this->group_assignment_data[$mod->instance]) {
-
-            $coursegroups = $this->group_assignment_data[$mod->instance]->groups;
-            $groupsubmissions = $this->group_assignment_data[$mod->instance]->submitted > 0 ?
-                $this->group_assignment_data[$mod->instance]->submitted : 0;
-            $groupgradings = $this->group_assignment_data[$mod->instance]->graded;
-            $ungraded = $groupsubmissions - $groupgradings;
-
-            $badgetext = $pretext
-                .$groupsubmissions
-                .$xofy
-                .$coursegroups
-                .$groupstext
-                .$posttext;
-            // If there are ungraded submissions show that in the badge as well.
-            if ($ungraded) {
-                $badgetext =
-                    $badgetext
-                    .$spacer
-                    .$ungraded
-                    .$ungradedtext;
-            }
-
-            if ($badgetext) {
-                return $this->html_label($badgetext, '', '', $url);
-            } else {
-                return '';
-            }
-        }
-    }
     public function show_assign_group_submissions($mod) {
-        global $COURSE;
         // Show group submissions by enrolled students.
         $spacer = get_string('label_commaspacer', 'format_qmultopics');
         $pretext = '';
@@ -846,8 +687,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_choice_answers($mod) {
-        global $CFG;
-
         if (!$enrolledstudents = $this->enrolled_users('choice')) {
             return '';
         }
@@ -855,7 +694,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_answered', 'format_qmultopics');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+//        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/report.php?id='.$mod->id;
         // Get the number of submissions for this module.
         if (!isset($this->choice_answers[$mod->instance]->submitted) ||
             !$submissions = $this->choice_answers[$mod->instance]->submitted) {
@@ -877,8 +717,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_choice_answer($mod) {
-        global $CFG;
-
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
 
@@ -904,7 +742,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     public function show_feedback_label($mod) {
         $o = '';
 
-        if (isset($this->choice_data[$mod->instance])) {
+        if (isset($this->feedback_data[$mod->instance])) {
             $o .= $this->show_due_date_label($mod, $this->feedback_data[$mod->instance]->duedate);
         }
         // Check if the user is able to grade (e.g. is a teacher).
@@ -928,8 +766,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_feedback_completions($mod) {
-        global $CFG;
-
         if (!$enrolledstudents = $this->enrolled_users('feedback')) {
             return '';
         }
@@ -938,7 +774,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_completed', 'format_qmultopics');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/feedback/show_entries.php?id='.$mod->id;
 
         // Get the number of submissions for this module.
         if (!$completions = $this->feedback_completions[$mod->instance]->completed) {
@@ -960,8 +796,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_feedback_completion($mod) {
-        global $CFG;
-
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
         if (isset($this->feedback_completions[$mod->instance]->completed) &&
@@ -1012,8 +846,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_lesson_attempts($mod) {
-        global $CFG;
-
         if (!$enrolledstudents = $this->enrolled_users('lesson')) {
             return '';
         }
@@ -1024,7 +856,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_attempted', 'format_qmultopics');
         $completedtext = get_string('label_completed', 'format_qmultopics');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/lesson/report.php?id='.$mod->id;
 
         // Get the number of submissions for this module.
         if (!$submissions = $this->lesson_submissions[$mod->instance]->submitted) {
@@ -1059,8 +891,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_lesson_attempt($mod) {
-        global $CFG;
-
         $o = '';
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
@@ -1113,7 +943,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     }
 
     /**
-     * Show quiz attempts of all students.
+     * Show quiz attempts and finished ones of all students.
      *
      * @param $mod
      * @return string
@@ -1121,8 +951,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_quiz_attempts($mod) {
-        global $CFG;
-
         if (!$enrolledstudents = $this->enrolled_users('quiz')) {
             return '';
         }
@@ -1131,7 +959,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $pretext = '';
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_attempted', 'format_qmultopics');
-        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
+        $url = '/mod/'.$mod->modname.'/report.php?id='.$mod->id.'&mode=overview';
 
         // Get the number of submissions for this module.
         if (!isset($this->quiz_submitted[$mod->instance]->submitted) ||
@@ -1161,8 +989,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws coding_exception
      */
     public function show_quiz_attempt($mod) {
-        global $CFG;
-
         $o = '';
         $dateformat = "%d %B %Y";
         $url = '/mod/'.$mod->modname.'/view.php?id='.$mod->id;
