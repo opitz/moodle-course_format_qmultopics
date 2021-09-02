@@ -1308,7 +1308,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentids
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_choice_answers($courseid, $studentids) {
@@ -1346,7 +1347,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentid
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_student_choice_answers($courseid, $studentid) {
@@ -1421,7 +1423,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentids
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_feedback_completions($courseid, $studentids) {
@@ -1459,7 +1462,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentid
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_student_feedback_completions($courseid, $studentid) {
@@ -1535,7 +1539,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentids
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_lesson_submissions($courseid, $studentids) {
@@ -1575,7 +1580,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentid
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_student_lesson_submissions($courseid, $studentid) {
@@ -1656,7 +1662,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentids
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_quiz_submitted($courseid, $studentids) {
@@ -1696,7 +1703,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      *
      * @param $courseid
      * @param $studentid
-     * @return array
+     * @return array|bool|float|int|mixed|string
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function get_student_quiz_submitted($courseid, $studentid) {
