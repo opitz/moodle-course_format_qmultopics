@@ -92,11 +92,32 @@ class qmultopics_course_renderer extends \core_course_renderer{
         parent::__construct($page, $target);
     }
 
-    protected function get_enrolled_students() {
+    /**
+     * Get enrolled students for assign, choice, feedback, lesson and quiz modules
+     * and store the result in a cached array.
+     *
+     * @return array
+     * @throws dml_exception
+     */
+    protected function get_enrolled_students0() {
         $result = [];
         $mtypes = ['assign', 'choice', 'feedback', 'lesson', 'quiz'];
         foreach ($mtypes as $mtype) {
             $result[$mtype] = $this->enrolled_users($mtype);
+        }
+        return $result;
+    }
+    protected function get_enrolled_students() {
+        global $COURSE;
+
+        $cache = cache::make('format_qmultopics', 'enrolled_users');
+        if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$result = $cache->get($COURSE->id)) {
+            $result = [];
+            $mtypes = ['assign', 'choice', 'feedback', 'lesson', 'quiz'];
+            foreach ($mtypes as $mtype) {
+                $result[$mtype] = $this->enrolled_users($mtype);
+            }
+            $cache->set($COURSE->id, $result);
         }
         return $result;
     }
@@ -381,7 +402,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @return array
      * @throws dml_exception
      */
-    public function enrolled_users($capability) {
+    public function enrolled_users0($capability) {
         global $COURSE, $DB;
 
         $cache = cache::make('format_qmultopics', 'enrolled_users');
@@ -420,6 +441,41 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $cache->set($capability, $result);
         }
         return $result;
+    }
+    public function enrolled_users($capability) {
+        global $COURSE, $DB;
+
+        switch($capability) {
+            case 'assign':
+                $capability = 'mod/assign:submit';
+                break;
+            case 'quiz':
+                $capability = 'mod/quiz:attempt';
+                break;
+            case 'choice':
+                $capability = 'mod/choice:choose';
+                break;
+            case 'feedback':
+                $capability = 'mod/feedback:complete';
+                break;
+            default:
+                // If no modname is specified, assume a count of all users is required.
+                $capability = '';
+        }
+
+        $context = \context_course::instance($COURSE->id);
+        $groupid = '';
+
+        $onlyactive = true;
+        $capjoin = get_enrolled_with_capabilities_join(
+            $context, '', $capability, $groupid, $onlyactive);
+        $sql = "SELECT DISTINCT u.id
+            FROM {user} u
+            $capjoin->joins
+            WHERE $capjoin->wheres
+            AND u.deleted = 0
+            ";
+        return $DB->get_records_sql($sql, $capjoin->params);
     }
 
     // Assignments.
@@ -480,7 +536,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_submitted', 'format_qmultopics');
         $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
-        $enrolledstudents = $this->enrolled_users('assign');
+        $enrolledstudents = $this->enrolled_students['assign'];
         $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         if (!empty($mod->availability)) {
@@ -540,7 +596,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $posttext = get_string('label_submitted', 'format_qmultopics');
         $groupstext = get_string('label_groups', 'format_qmultopics');
         $ungradedtext = get_string('label_ungraded', 'format_qmultopics');
-        $enrolledstudents = $this->enrolled_users('assign');
+        $enrolledstudents = $this->enrolled_students['assign'];
         $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
 
         if ($enrolledstudents && isset($this->group_assignment_data) && $this->group_assignment_data[$mod->instance]) {
@@ -687,15 +743,15 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_choice_answers($mod) {
-        if (!$enrolledstudents = $this->enrolled_users('choice')) {
+        if (!$enrolledstudents = $this->enrolled_students['choice']) {
             return '';
         }
 
         $pretext = '';
         $xofy = get_string('label_xofy', 'format_qmultopics');
         $posttext = get_string('label_answered', 'format_qmultopics');
-//        $url = '/mod/'.$mod->modname.'/view.php?action=grading&id='.$mod->id.'&tsort=timesubmitted&filter=require_grading';
         $url = '/mod/'.$mod->modname.'/report.php?id='.$mod->id;
+
         // Get the number of submissions for this module.
         if (!isset($this->choice_answers[$mod->instance]->submitted) ||
             !$submissions = $this->choice_answers[$mod->instance]->submitted) {
@@ -766,7 +822,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_feedback_completions($mod) {
-        if (!$enrolledstudents = $this->enrolled_users('feedback')) {
+        if (!$enrolledstudents = $this->enrolled_students['feedback']) {
             return '';
         }
 
@@ -846,7 +902,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_lesson_attempts($mod) {
-        if (!$enrolledstudents = $this->enrolled_users('lesson')) {
+    if (!$enrolledstudents = $this->enrolled_students['lesson']) {
             return '';
         }
 
@@ -951,7 +1007,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_quiz_attempts($mod) {
-        if (!$enrolledstudents = $this->enrolled_users('quiz')) {
+        if (!$enrolledstudents = $this->enrolled_students['quiz']) {
             return '';
         }
 
