@@ -51,7 +51,7 @@ require_once($CFG->dirroot.'/course/format/qmultopics/lib.php');
 
 /**
  * Class restore_format_qmultopics_plugin
- * 
+ *
  * Restore plugin class that provides the necessary information
  * Needed to restore one qmultopics course format
  */

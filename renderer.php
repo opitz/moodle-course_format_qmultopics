@@ -34,10 +34,12 @@ require_once($CFG->dirroot . '/course/format/topics2/renderer.php');
  *
  * @copyright 2019 Matthias Opitz
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @param stdClass $courseformat
+ * @param stdClass $tcsettings
  */
 class format_qmultopics_renderer extends format_topics2_renderer {
 
-    protected  $courseformat = null;
+    protected $courseformat = null;
     protected $tcsettings;
 
     /**
