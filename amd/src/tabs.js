@@ -174,6 +174,34 @@ define(['jquery', 'jqueryui'], function($) {
             };
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+            /**
+             * When a limit for the tabname is set expand the name of the given tab to the original
+             *
+             * @param {Object} tab
+             * @param {string} origTabTitle
+             * @param {number} tabNameLimit
+             */
+            var doTheExpand = function(tab, origTabTitle, tabNameLimit) {
+                if ($('.inplaceeditingon').length === 0) { // Don't do this while editing the tab name
+                    var shortTabTitle = origTabTitle.substr(0, tabNameLimit) + String.fromCharCode(8230);
+                    if ($('.inplaceeditable').length > 0) { // We are in edit mode...
+
+                        // Make sure that tab-tile matches data-value after the tab title was edited
+                        var dataValue = tab.find('.inplaceeditable').attr('data-value');
+                        if (origTabTitle !== dataValue) { // They do NOT match so make them
+                            tab.attr('tab_title', dataValue);
+                            origTabTitle = dataValue;
+                            shortTabTitle = origTabTitle.substr(0, tabNameLimit) + String.fromCharCode(8230);
+                        }
+
+                        tab.find('a').html(tab.find('a').html().replace(escapeHtml(shortTabTitle), origTabTitle));
+                    } else {
+                        tab.html(tab.html().replace(escapeHtml(shortTabTitle), origTabTitle));
+                    }
+                }
+            };
+
             /**
              * When a limit for the tabname is set expand the name of the given tab to the original
              *
@@ -182,30 +210,14 @@ define(['jquery', 'jqueryui'], function($) {
             var expandTabname = function(tab) {
 
                 if ($('.limittabname').length > 0) {
-                    var x = $('.limittabname').attr('value');
+                    var tabNameLimit = $('.limittabname').attr('value');
                     var origTabTitle = tab.attr('tab_title');
 
-                    if (origTabTitle.length > x) {
-                        var shortTabTitle = origTabTitle.substr(0, x) + String.fromCharCode(8230);
+                    if (origTabTitle.length > tabNameLimit) {
                         if (tab.hasClass('tabsectionname')) { // A sectionname as tabname
                             tab.html(origTabTitle);
                         } else {
-                            if ($('.inplaceeditingon').length === 0) { // Don't do this while editing the tab name
-                                if ($('.inplaceeditable').length > 0) { // We are in edit mode...
-
-                                    // Make sure that tab-tile matches data-value after the tab title was edited
-                                    var dataValue = tab.find('.inplaceeditable').attr('data-value');
-                                    if (origTabTitle !== dataValue) { // They do NOT match so make them
-                                        tab.attr('tab_title', dataValue);
-                                        origTabTitle = dataValue;
-                                        shortTabTitle = origTabTitle.substr(0, x) + String.fromCharCode(8230);
-                                    }
-
-                                    tab.find('a').html(tab.find('a').html().replace(escapeHtml(shortTabTitle), origTabTitle));
-                                } else {
-                                    tab.html(tab.html().replace(escapeHtml(shortTabTitle), origTabTitle));
-                                }
-                            }
+                            doTheExpand(tab, origTabTitle, tabNameLimit);
                         }
                     }
                 }
