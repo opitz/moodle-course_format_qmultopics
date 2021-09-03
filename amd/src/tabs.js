@@ -772,7 +772,7 @@ define(['jquery', 'jqueryui'], function($) {
                 initFunctions();
 
                 // Move the Assessment Information block when active
-                if ( $('.block_assessment_information').length > 0) {
+                if ($('.block_assessment_information').length > 0) {
                     // Move the block into it's area in the main region
                     $('#assessment_information_area').append($('.block_assessment_information'));
                     // If the AI block is the only one remove the 'has-blocks' class from the main region
