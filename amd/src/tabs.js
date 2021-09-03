@@ -135,27 +135,37 @@ define(['jquery', 'jqueryui'], function($) {
 
 // ---------------------------------------------------------------------------------------------------------------------
             /**
+             * When a limit for the tabname is set expand the name of the given tab to the original
+             *
+             * @param {Object} tab
+             * @param {string} origTabTitle
+             * @param {string} shortTabTitle
+             */
+            var doTheTruncate = function(tab, origTabTitle, shortTabTitle) {
+                if ($('.inplaceeditingon').length === 0) { // Don't do this while editing the tab name
+                    if ($('.inplaceeditable').length > 0) { // We are in edit mode...
+                        tab.find('a').html(tab.find('a').html().replace(escapeHtml(origTabTitle), shortTabTitle));
+                    } else {
+                        tab.html(tab.html().replace(escapeHtml(origTabTitle), shortTabTitle));
+                    }
+                }
+            };
+
+           /**
              * When a limit for the tabname is set truncate the name of the given tab to limit
              *
              * @param {Object} tab
              */
             var truncateTabname = function(tab) {
-
                 if ($('.limittabname').length > 0) {
-                    var x = $('.limittabname').attr('value');
+                    var tabNameLimit = $('.limittabname').attr('value');
                     var origTabTitle = tab.attr('tab_title');
-                    if (origTabTitle.length > x) {
-                        var shortTabTitle = origTabTitle.substr(0, x) + String.fromCharCode(8230);
+                    if (origTabTitle.length > tabNameLimit) {
+                        var shortTabTitle = origTabTitle.substr(0, tabNameLimit) + String.fromCharCode(8230);
                         if (tab.hasClass('tabsectionname')) { // A sectionname as tabname
                             tab.html(shortTabTitle);
                         } else {
-                            if ($('.inplaceeditingon').length === 0) { // Don't do this while editing the tab name
-                                if ($('.inplaceeditable').length > 0) { // We are in edit mode...
-                                    tab.find('a').html(tab.find('a').html().replace(escapeHtml(origTabTitle), shortTabTitle));
-                                } else {
-                                    tab.html(tab.html().replace(escapeHtml(origTabTitle), shortTabTitle));
-                                }
-                            }
+                            doTheTruncate(tab, origTabTitle, shortTabTitle);
                         }
                     }
                 }
