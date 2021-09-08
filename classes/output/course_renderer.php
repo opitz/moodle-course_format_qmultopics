@@ -997,7 +997,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             .($submissions > 0 ? ', '.$finished.get_string('label_finished', 'format_qmultopics') : '');
 
         $badgetext = $pretext
-            .$submissions
+            .$finished
             .$xofy
             .count($enrolledstudents)
             .$posttext
