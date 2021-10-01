@@ -439,7 +439,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function show_assignment_labels($mod) {
-        global $COURSE;
+        global $CFG, $COURSE;
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
         $o = '';
         if (isset($this->assignment_data[$mod->instance])) {
