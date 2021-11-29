@@ -59,11 +59,13 @@ div.badge {
     color: #fff;
     background-color: #ca3120;
 }
-a.label-danger:hover, a.label-danger:focus {
+a.label-danger:hover,
+a.label-danger:focus {
     color: #fff;
-    background-color: #9e2619;
+    background-color: #ca3120;
 }
-a.label-danger:focus, a.label-danger.focus {
+a.label-danger:focus,
+a.label-danger.focus {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(202, 49, 32, 0.5);
 }
