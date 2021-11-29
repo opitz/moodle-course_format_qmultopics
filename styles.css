@@ -45,12 +45,25 @@
     padding-top: 10px;
 }
 
-/* Badge Styles */
+/* Label Styles */
 div.badge {
     padding: 5px;
     border-radius: 4px;
 }
 
-a.badge-danger {
-    color: white !important;
+.label-danger {
+    color: #fff;
+    background-color: #ca3120;
+}
+.badge a.label-danger {
+    color: #fff;
+    background-color: #ca3120;
+}
+a.label-danger:hover, a.label-danger:focus {
+    color: #fff;
+    background-color: #9e2619;
+}
+a.label-danger:focus, a.label-danger.focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(202, 49, 32, 0.5);
 }

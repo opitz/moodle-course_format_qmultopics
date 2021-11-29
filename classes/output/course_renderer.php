@@ -296,7 +296,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         switch( true ) {
             case $diffdays == 0:
-                $badgeclass = ' badge-danger';
+                $badgeclass = ' label-danger';
                 if ($cutoffdate > 0 && $duedate < time()) {
                     $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $cutoffdate ));
                     $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
@@ -333,11 +333,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
                     switch( true ) {
                         case $diffdays == 0:
-                            $badgeclass = ' badge-danger';
+                            $badgeclass = ' label-danger';
                             $duetext = get_string('label_duetoday', 'format_qmultopics');
                             break;
                         case $diffdays < 0:
-                            $badgeclass = ' badge-danger';
+                            $badgeclass = ' label-danger';
                             $duetext = get_string('label_wasdue', 'format_qmultopics');
                             break;
                         default:
@@ -346,7 +346,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                             break;
                     }
                 } else {
-                    $badgeclass = ' badge-danger';
+                    $badgeclass = ' label-danger';
                     $duetext = get_string('label_wasdue', 'format_qmultopics');
                 }
                 break;
