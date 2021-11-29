@@ -36,6 +36,7 @@ Feature: See various assessment badges
     When I log in as "student"
     And I am on "Course 1" course homepage
     Then I should see "Due 31 December 2025"
+    And I uncollapse section "1"
     And I should see "Not attempted"
 
   @javascript
@@ -49,6 +50,7 @@ Feature: See various assessment badges
       | TF2      | 1    | 3.0     |
     When I log in as "teacher"
     And I am on "Course 1" course homepage
+    And I uncollapse section "1"
     Then I should see "Due 31 December 2025"
 #    And I should see "0 of 1 Attempted"
 
@@ -67,6 +69,7 @@ Feature: See various assessment badges
       |   2  | False    |
     When I log in as "student"
     And I am on "Course 1" course homepage
+    And I uncollapse section "1"
     Then I should see "Due 31 December 2025"
     And I should see "Finished"
 
@@ -77,4 +80,5 @@ Feature: See various assessment badges
       | assign    | C1      | assign1   | Test Assignment 1 | Test Assignment 1 |
     When I log in as "teacher"
     And I am on "Course 1" course homepage
+    And I uncollapse section "1"
     Then I should not see "Was due"
