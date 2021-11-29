@@ -6,9 +6,9 @@ Feature: See various assessment badges
 
   Background:
     Given the following "users" exist:
-      | username | firstname | lastname | email                |
+      | username | firstname | lastname | email               |
       | teacher  | Teacher   | One      | teacher@example.com |
-      | student  | Student   | One      | student@example.com  |
+      | student  | Student   | One      | student@example.com |
     And the following "courses" exist:
       | fullname | shortname | format     | coursedisplay | numsections |
       | Course 1 | C1        | qmultopics | 0             | 5           |
@@ -23,6 +23,9 @@ Feature: See various assessment badges
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
       | Test questions   | truefalse   | TF2   | Second question |
+    And the following "config plugins" exist:
+      | plugin            | name            | value |
+      | format_qmultopics | useassignlabels | 1     |
 
   @javascript
   Scenario: As a student see a badge with a time limit and a badge with no attempt
@@ -35,8 +38,8 @@ Feature: See various assessment badges
       | TF2      | 1    | 3.0     |
     When I log in as "student"
     And I am on "Course 1" course homepage
-    Then I should see "Due 31 December 2025"
     And I uncollapse section "1"
+    Then I should see "Due 31 December 2025"
     And I should see "Not attempted"
 
   @javascript
