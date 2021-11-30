@@ -1633,10 +1633,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
             select
             cm.instance as moduleid
             ,q.timeclose as duedate
-            #,cm.id
             from {course_modules} cm
             join {modules} m on m.id = cm.module
-            # quiz
             join {quiz} q on q.id = cm.instance and q.course = cm.course
             where m.name = 'quiz'
             and cm.course = $courseid
