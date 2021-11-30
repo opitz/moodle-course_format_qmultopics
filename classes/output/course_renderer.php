@@ -1135,6 +1135,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignments_submitted($courseid, $studentids) {
         global $DB;
 
+        // Check if there are acyually student ids
+        if ($studentids == '') {
+            return array();
+        }
+
         // Check if $courseid is actually a course object and if so get the ID.
         if (is_object($courseid)) {
             $courseid = $courseid->id;
