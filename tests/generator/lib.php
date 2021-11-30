@@ -35,6 +35,12 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class format_qmultopics_generator extends component_generator_base {
+
+    /**
+     * Generate some plugin configurations
+     *
+     * @param {Object} $pluginconfig
+     */
     public function create_config_plugins($pluginconfig) {
         global $DB;
         $DB->insert_record("config_plugins", $pluginconfig);
