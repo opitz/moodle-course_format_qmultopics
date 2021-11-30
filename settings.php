@@ -29,7 +29,7 @@ if ($ADMIN->fulltree) {
     $name = 'format_qmultopics/useassignlabels';
     $title = get_string('useassignlabels', 'format_qmultopics');
     $description = get_string('useassignlabels_desc', 'format_qmultopics');
-    $default = 0;
+    $default = 1;
     $choices = array(
         0 => new lang_string('no'), // No.
         1 => new lang_string('yes')   // Yes.
@@ -41,7 +41,7 @@ if ($ADMIN->fulltree) {
         $name = 'format_qmultopics/useassignlabelcaches';
         $title = get_string('useassignlabelcaches', 'format_qmultopics');
         $description = get_string('useassignlabelcaches_desc', 'format_qmultopics');
-        $default = 0;
+        $default = 1;
         $choices = array(
             0 => new lang_string('no'), // No.
             1 => new lang_string('yes')   // Yes.

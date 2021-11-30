@@ -11,8 +11,9 @@ class behat_format_qmultopics_generator extends behat_generator_base {
     protected function get_creatable_entities(): array {
         return [
             'config plugins' => [
+                'singular' => 'config plugin',
                 'datagenerator' => 'config_plugins',
-                'required' => ['plugin', 'name', 'value']
+                'required' => []
             ],
         ];
     }

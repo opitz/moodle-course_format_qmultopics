@@ -23,9 +23,6 @@ Feature: See various assessment badges
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
       | Test questions   | truefalse   | TF2   | Second question |
-    And the following "config plugins" exist:
-      | plugin            | name            | value |
-      | format_qmultopics | useassignlabels | 1     |
 
   @javascript
   Scenario: As a student see a badge with a time limit and a badge with no attempt
