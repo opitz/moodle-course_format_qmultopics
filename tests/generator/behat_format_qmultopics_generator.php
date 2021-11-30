@@ -38,7 +38,7 @@ class behat_format_qmultopics_generator extends behat_generator_base {
 
     /**
      * Get the creatable entities
-     * 
+     *
      * @return array
      */
     protected function get_creatable_entities(): array {
