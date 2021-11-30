@@ -1135,7 +1135,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     protected function get_assignments_submitted($courseid, $studentids) {
         global $DB;
 
-        // Check if there are acyually student ids
+        // Check if there are actually student ids.
         if ($studentids == '') {
             return array();
         }
