@@ -23,6 +23,12 @@ Feature: See various assessment badges
       | questioncategory | qtype       | name  | questiontext               |
       | Test questions   | truefalse   | TF1   | Text of the first question |
       | Test questions   | truefalse   | TF2   | Second question |
+    And I log in as "admin"
+    And I navigate to "Plugins > Topics format (QMUL)" in site administration
+    And I set the following fields to these values:
+      | Use assessment labels  | Yes |
+    And I press "Save changes"
+    And I log out
 
   @javascript
   Scenario: As a student see a badge with a time limit and a badge with no attempt

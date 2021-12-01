@@ -29,7 +29,7 @@ if ($ADMIN->fulltree) {
     $name = 'format_qmultopics/useassignlabels';
     $title = get_string('useassignlabels', 'format_qmultopics');
     $description = get_string('useassignlabels_desc', 'format_qmultopics');
-    $default = 1;
+    $default = 0;
     $choices = array(
         0 => new lang_string('no'), // No.
         1 => new lang_string('yes')   // Yes.
