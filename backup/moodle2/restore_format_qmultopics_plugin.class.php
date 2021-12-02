@@ -1,5 +1,3 @@
-106 lines (91 sloc)  3.91 KB
-
 <?php
 // This file is part of Moodle - http://moodle.org/
 //
@@ -51,7 +49,7 @@ require_once($CFG->dirroot.'/course/format/qmultopics/lib.php');
 
 /**
  * Class restore_format_qmultopics_plugin
- *
+ * 
  * Restore plugin class that provides the necessary information
  * Needed to restore one qmultopics course format
  */

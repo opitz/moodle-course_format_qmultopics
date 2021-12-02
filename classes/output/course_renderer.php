@@ -19,6 +19,8 @@ require_once($CFG->dirroot . '/course/renderer.php');
 
 /**
  * Class qmultopics_course_renderer
+ *
+ * @package format_qmultopics
  */
 class qmultopics_course_renderer extends \core_course_renderer{
 
@@ -174,6 +176,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * Show a due date badge
      *
      * @param stdClass $duedate
+     * @param date $cutoffdate
      * @return string
      * @throws coding_exception
      */
@@ -217,7 +220,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                             $badgedate = $cutoffdate;
                             break;
                     }
-                } elseif ($duedate < time()) {
+                } else if ($duedate < time()) {
                     $dateformat = "%d %B %Y %H:%M:%S";
                     $duetext = get_string('badge_wasdue', 'format_qmultopics');
                 } else {
@@ -226,7 +229,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 break;
             case $diffdays < 0:
                 if ($cutoffdate > 0) {
-                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $cutoffdate ));
                     $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
                     $diff = $today->diff( $matchdate );
