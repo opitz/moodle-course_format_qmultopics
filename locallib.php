@@ -14,6 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Local library for format_qmultopics
+ *
+ * @package    format_qmultopics
+ * @copyright  2020 Matthias Opitz
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/course/lib.php');
 
@@ -23,7 +31,7 @@ define('FORMAT_QMULTOPICS_IMAGE_NAME', 'qmt1');
 /**
  * Functions for all QMUL news formats
  *
- * @param $course
+ * @param stdClass $course
  * @return string
  * @throws coding_exception
  * @throws dml_exception
@@ -95,7 +103,7 @@ function format_qmultopics_getnews($course) {
 /**
  * Truncate text
  *
- * @param $text
+ * @param string $text
  * @param int $length
  * @param string $ending
  * @param bool $exact

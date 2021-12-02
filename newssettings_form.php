@@ -22,6 +22,8 @@ require_once($CFG->libdir . '/formslib.php');
 
 /**
  * Class newssettings_form
+ *
+ * @package format_qmultopics
  */
 class newssettings_form extends moodleform {
 

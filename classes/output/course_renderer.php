@@ -28,14 +28,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * This includes link, content, availability, completion info and additional information
      * that module type wants to display (i.e. number of unread forum posts)
      *
-     * This function calls:
-     * {@link core_course_renderer::course_section_cm_name()}
-     * {@link core_course_renderer::course_section_cm_text()}
-     * {@link core_course_renderer::course_section_cm_availability()}
-     * {@link core_course_renderer::course_section_cm_completion()}
-     * {@link course_get_cm_edit_actions()}
-     * {@link core_course_renderer::course_section_cm_edit_actions()}
-     *
      * @param stdClass $course
      * @param completion_info $completioninfo
      * @param cm_info $mod
@@ -47,15 +39,13 @@ class qmultopics_course_renderer extends \core_course_renderer{
      */
     public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
         $output = '';
-        /*
-        We return empty string (because course module will not be displayed at all)
-        if:
-        1) The activity is not visible to users
-        and
-        2) The 'availableinfo' is empty, i.e. the activity was
-           hidden in a way that leaves no info, such as using the
-           eye icon.
-        */
+        // We return empty string (because course module will not be displayed at all)
+        // if:
+        // 1) The activity is not visible to users
+        // and
+        // 2) The 'availableinfo' is empty, i.e. the activity was
+        // hidden in a way that leaves no info, such as using the
+        // eye icon.
         if (!$mod->is_visible_on_course_page()) {
             return $output;
         }
@@ -134,7 +124,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $output .= $contentpart;
         }
 
-        // Amending badges - but for courses with < 1000 students only
+        // Amending badges - but for courses with < 1000 students only.
         if (count($this->enrolled_users('')) < 1000) {
             $output .= html_writer::start_div();
             $output .= $this->show_badges($mod);
@@ -153,7 +143,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show a badge for the given module
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -183,40 +173,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show a due date badge
      *
-     * @param $duedate
+     * @param stdClass $duedate
      * @return string
      * @throws coding_exception
      */
-    public function show_due_date_badge0($duedate, $cutoffdate = 0) {
-        // If duedate is 0 don't show a badge.
-        if ($duedate == 0) {
-            return '';
-        }
-        $dateformat = "%d %B %Y";
-        $badgedate = $duedate;
-        $badgeclass = '';
-        $duetext = get_string('badge_due', 'format_qmultopics');
-        if ($duedate < time()) {
-            // The due date has passed - show a red badge.
-            $badgeclass = ' badge-danger';
-            // If a cutoff date is set and has not elapsed yet show it now
-            if ($cutoffdate >= time()) {
-                $duetext = get_string('badge_cutoffdate', 'format_qmultopics');
-                $badgedate = $cutoffdate;
-            } else {
-                if ($duedate < (time() - 86400)) {
-                    $duetext = get_string('badge_wasdue', 'format_qmultopics');
-                } else {
-                    $duetext = get_string('badge_duetoday', 'format_qmultopics');
-                }
-            }
-        } else if ($duedate < (time() + (60 * 60 * 24 * 14))) {
-            // Only 14 days left until the due date - show a yellow badge.
-            $badgeclass = ' badge-warning';
-        }
-        $badgecontent = $duetext . userdate($badgedate, $dateformat);
-        return $this->html_badge($badgecontent, $badgeclass);
-    }
     public function show_due_date_badge($duedate, $cutoffdate = 0) {
         // If duedate is 0 don't show a badge.
         if ($duedate == 0) {
@@ -226,24 +186,24 @@ class qmultopics_course_renderer extends \core_course_renderer{
         $badgedate = $duedate;
         $badgeclass = '';
 
-        $today = new DateTime(); // This object represents current date/time
-        $today->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+        $today = new DateTime(); // This object represents current date/time.
+        $today->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-        $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$duedate ));
-        $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+        $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $duedate ));
+        $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-        $diff = $today->diff( $match_date );
-        $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+        $diff = $today->diff( $matchdate );
+        $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
         switch( true ) {
             case $diffdays == 0:
                 $badgeclass = ' badge-danger';
                 if ($cutoffdate > 0 && $duedate < time()) {
-                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
-                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i", $cutoffdate ));
+                    $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-                    $diff = $today->diff( $match_date );
-                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+                    $diff = $today->diff( $matchdate );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
                     switch( true ) {
                         case $diffdays == 0:
@@ -266,11 +226,11 @@ class qmultopics_course_renderer extends \core_course_renderer{
                 break;
             case $diffdays < 0:
                 if ($cutoffdate > 0) {
-                    $match_date = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
-                    $match_date->setTime( 0, 0, 0 ); // reset time part, to prevent partial comparison
+                    $matchdate = DateTime::createFromFormat( "Y.m.d\\TH:i", date("Y.m.d\\TH:i",$cutoffdate ));
+                    $matchdate->setTime( 0, 0, 0 ); // Reset time part, to prevent partial comparison.
 
-                    $diff = $today->diff( $match_date );
-                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval
+                    $diff = $today->diff( $matchdate );
+                    $diffdays = (integer)$diff->format( "%R%a" ); // Extract days count in interval.
 
                     switch( true ) {
                         case $diffdays == 0:
@@ -298,8 +258,6 @@ class qmultopics_course_renderer extends \core_course_renderer{
             default:
                 $duetext = get_string('badge_due', 'format_qmultopics');
         }
-
-
         $badgecontent = $duetext . userdate($badgedate, $dateformat);
         return $this->html_badge($badgecontent, $badgeclass);
     }
@@ -307,7 +265,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Return the html for a badge
      *
-     * @param $badgetext
+     * @param string $badgetext
      * @param string $badgeclass
      * @param string $title
      * @return string
@@ -323,7 +281,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get the enrolled users with the given capability
      *
-     * @param $capability
+     * @param stdClass $capability
      * @return array
      * @throws dml_exception
      */
@@ -367,7 +325,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge for assign plus additional due date badge
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -409,7 +367,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with submissions and gradings for all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -477,7 +435,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with submissions and gradings for all groups
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -541,7 +499,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * A badge to show the student as $USER his/her submission status
      * It will display the date of a submission, a mouseover will show the time for the submission
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -584,7 +542,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Return grading if the given student as $USER has been graded yet
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return array
      */
     protected function get_grading($mod) {
@@ -611,7 +569,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Return true if the submission of the group of which the given student is a member has already been graded
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return bool
      */
     protected function get_group_grading($mod) {
@@ -639,7 +597,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge for choice plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -673,7 +631,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with choice answers of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -715,7 +673,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show choice answer for current student as $USER
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -747,7 +705,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show feedback badge plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -781,7 +739,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with feedback completions of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -824,7 +782,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show feedback by current student as $USER
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -855,7 +813,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show lesson badge plus additional due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -889,7 +847,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show badge with lesson attempts of all students
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -946,7 +904,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show lesson attempt for the current student as $USER
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */
@@ -982,7 +940,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Quiz badge plus a due date badge if there is a due date
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -1016,7 +974,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show quiz attempts of all students.
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      * @throws dml_exception
@@ -1065,7 +1023,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Show quiz attempts for the current student as $USER
      *
-     * @param $mod
+     * @param stdClass $mod
      * @return string
      * @throws coding_exception
      */

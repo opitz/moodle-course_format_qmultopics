@@ -37,14 +37,16 @@ require_once($CFG->dirroot . '/course/format/topics2/renderer.php');
  */
 class format_qmultopics_renderer extends format_topics2_renderer {
 
-    private $courseformat = null;
-    private $tcsettings;
+    /** @var stdClass */
+    protected $courseformat = null;
+    /** @var stdClass */
+    protected $tcsettings;
 
     /**
      * format_qmultopics_renderer constructor.
      *
      * @param moodle_page $page
-     * @param $target
+     * @param stdClass $target
      * @throws dml_exception
      */
     public function __construct(moodle_page $page, $target) {
@@ -375,12 +377,13 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     /**
      * Get the content for the assessment information section
      *
-     * @param $content
+     * @param array|stdClass $content
      * @return string
      * @throws coding_exception
      * @throws dml_exception
      * @throws moodle_exception
      */
+    /**
     public function get_assessmentinformation($content) {
         global $CFG, $DB, $COURSE, $USER;
 
@@ -597,10 +600,8 @@ class format_qmultopics_renderer extends format_topics2_renderer {
     /**
      * Render an extratab
      *
-     * @param $tab
+     * @param array|stdClass $tab
      * @return string
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function render_extratab($tab) {
         global $DB;
