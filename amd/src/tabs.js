@@ -148,7 +148,7 @@ define(['jquery', 'jqueryui'], function($) {
                 }
             };
 
-           /**
+            /**
              * When a limit for the tabname is set truncate the name of the given tab to limit
              *
              * @param {Object} tab
@@ -322,7 +322,7 @@ define(['jquery', 'jqueryui'], function($) {
                 $('.section-handle').show();
                 $('.toggler_edit_only').removeClass('toggler_edit_only').show();
 
-                 console.log('--> restoring section headline ');
+                console.log('--> restoring section headline ');
             };
 
             /**
@@ -623,7 +623,7 @@ define(['jquery', 'jqueryui'], function($) {
                             var tabnr = $(this).attr('tabnr');
                             var newMenuText = 'To Tab ' +
                                 (tabArray[tabnr] === '' || tabArray[tabnr] === 'Tab ' + tabnr ? tabnr : '"' + tabArray[tabnr] +
-                                ((tabArray[tabnr] === 'Tab ' + tabnr || tabnr === '0') ? '"' : '" (Tab ' + tabnr + ')'));
+                                    ((tabArray[tabnr] === 'Tab ' + tabnr || tabnr === '0') ? '"' : '" (Tab ' + tabnr + ')'));
 
                             $(this).find('.menu-action-text').html(newMenuText);
                         });
