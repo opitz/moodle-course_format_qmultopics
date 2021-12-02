@@ -244,6 +244,7 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      * @throws dml_exception
      * @throws moodle_exception
      */
+    /**
     public function get_assessmentinformation($content) {
         global $CFG, $DB, $COURSE, $USER;
 
@@ -462,8 +463,6 @@ class format_qmultopics_renderer extends format_topics2_renderer {
      *
      * @param stdClass $tab
      * @return string
-     * @throws coding_exception
-     * @throws dml_exception
      */
     public function render_extratab($tab) {
         global $DB;

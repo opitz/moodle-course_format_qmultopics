@@ -731,11 +731,6 @@ define(['jquery', 'jqueryui'], function($) {
                 var draggedTab = ui.draggable.find('.topictab').first();
                 var targetTab = $(this).find('.topictab').first();
 
-                // For development purposes only - not used in production environments
-                var draggedTabId = draggedTab.attr('id');
-                var targetTabId = targetTab.attr('id');
-                console.log('The tab with ID "' + draggedTabId + '" was dropped onto tab with the ID "' + targetTabId + '"');
-
                 // Swap both tabs
                 var zwischenspeicher = draggedTab.parent().html();
                 draggedTab.parent().html(targetTab.parent().html());

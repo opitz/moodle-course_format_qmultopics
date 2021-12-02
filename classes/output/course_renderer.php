@@ -387,7 +387,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
     /**
      * Get a list of IDs of enrolled users of a course with the given capability
      *
+<<<<<<< HEAD
      * @param stdClass $courseid
+=======
+>>>>>>> QMPLUS-575
      * @param stdClass $capability
      * @return array
      * @throws dml_exception
