@@ -1193,9 +1193,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $cache = cache::make('format_qmultopics', 'student_assignment_data');
         if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
+            $uniqueid = $DB->sql_concat('cm.id', 'm.id', 'a.id', 'asu.id', 'gi.id', 'gg.id');
             $sql = "
             select
-            uuid_short()
+            $uniqueid as id
             ,cm.instance
             ,gg.finalgrade
             ,gi.hidden as gi_hidden
@@ -1206,7 +1207,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             join {modules} m on m.id = cm.module
             join {assign} a on a.id = cm.instance and a.course = cm.course
             join {assign_submission} asu on asu.assignment = a.id
-            join {grade}_items gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
+            join {grade_items} gi on (gi.courseid = cm.course and gi.itemmodule = m.name and gi.iteminstance = cm.instance)
             join {grade_grades} gg on (gg.itemid = gi.id and gg.userid = asu.userid)
             where m.name = 'assign'
             and gg.finalgrade > 0
@@ -1239,9 +1240,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $cache = cache::make('format_qmultopics', 'student_group_assignment_data');
         if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
+            $uniqueid = $DB->sql_concat('g.id', 'gm.id', 'asu.id', 'gi.id', 'gg.id');
             $sql = "
             select
-            uuid_short()
+            $uniqueid as id
             ,asu.assignment as instance
             ,gi.hidden as gi_hidden
             ,gi.locked as gi_locked
@@ -1593,9 +1595,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $cache = cache::make('format_qmultopics', 'student_lesson_data');
         if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
+            $uniqueid = $DB->sql_concat('cm.id', 'm.id', 'l.id', 'la.id');
             $sql = "
             select
-            uuid_short()
+            $uniqueid as id
             ,cm.instance as moduleid
             ,la.userid as submitted
             ,la.timeseen as submit_time
@@ -1714,9 +1717,10 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         $cache = cache::make('format_qmultopics', 'student_quiz_data');
         if (!get_config('format_qmultopics', 'useassignlabelcaches') || !$data = $cache->get($courseid)) {
+            $uniqueid = $DB->sql_concat('cm.id', 'm.id', 'q.id', 'qa.id');
             $sql = "
             select
-            uuid_short()
+            $uniqueid as IDENTITY 
             ,cm.instance as moduleid
             ,qa.userid as submitted
             ,qa.state as state
