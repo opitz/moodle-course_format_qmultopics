@@ -1720,7 +1720,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             $uniqueid = $DB->sql_concat('cm.id', 'm.id', 'q.id', 'qa.id');
             $sql = "
             select
-            $uniqueid as IDENTITY 
+            $uniqueid as id
             ,cm.instance as moduleid
             ,qa.userid as submitted
             ,qa.state as state
