@@ -209,13 +209,27 @@ class qmultopics_course_renderer extends \core_course_renderer{
         }
 
         if (class_exists('\core_completion\activity_custom_completion')) {
-            // Render the activity information.
-            $cm = $mod;
-            $completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
-            $activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
-            $modicons .= $this->output->activity_information($mod, $completiondetails, $activitydates);
+            // Fetch completion details.
+            $showcompletionconditions = $course->showcompletionconditions == COMPLETION_SHOW_CONDITIONS;
+            $completiondetails = \core_completion\cm_completion_details::get_instance($mod, $USER->id, $showcompletionconditions);
+            $ismanualcompletion = $completiondetails->has_completion() && !$completiondetails->is_automatic();
+
+            // Fetch activity dates.
+            $activitydates = [];
+            if ($course->showactivitydates) {
+                $activitydates = \core\activity_dates::get_dates_for_module($mod, $USER->id);
+            }
+
+            /* Show the activity information if:
+               - The course's showcompletionconditions setting is enabled; or
+               - The activity tracks completion manually; or
+               - There are activity dates to be shown. */
+            if ($showcompletionconditions || $ismanualcompletion || $activitydates) {
+                $modicons .= $this->output->activity_information($mod, $completiondetails, $activitydates);
+            }
         } else {
             $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
+
         }
 
         if (!empty($modicons)) {
