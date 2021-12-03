@@ -1499,7 +1499,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
             where m.name = 'feedback'
             and cm.course = $courseid
             and fc.userid = $studentid
-            group by cm.instance, fc.userid
+            group by cm.instance, fc.userid, fc.timemodified
             ";
             if ($data = $DB->get_records_sql($sql)) {
                 $cache->set($courseid, $data);
