@@ -209,8 +209,8 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         if (class_exists('\core_completion\activity_custom_completion')) {
             // Render the activity information.
-            $completiondetails = \core_completion\cm_completion_details::get_instance($mod, $this->user->id);
-            $activitydates = \core\activity_dates::get_dates_for_module($mod, $this->user->id);
+            $completiondetails = \core_completion\cm_completion_details::get_instance($mod, $this->userid);
+            $activitydates = \core\activity_dates::get_dates_for_module($mod, $this->userid);
             $modicons .= $this->output->activity_information($mod, $completiondetails, $activitydates);
         } else {
             $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
