@@ -132,6 +132,7 @@ class qmultopics_course_renderer extends \core_course_renderer{
      * @throws dml_exception
      */
     public function course_section_cm($course, &$completioninfo, cm_info $mod, $sectionreturn, $displayoptions = array()) {
+        global $USER;
         $output = '';
 
         // We return empty string (because course module will not be displayed at all)
@@ -209,8 +210,9 @@ class qmultopics_course_renderer extends \core_course_renderer{
 
         if (class_exists('\core_completion\activity_custom_completion')) {
             // Render the activity information.
-            $completiondetails = \core_completion\cm_completion_details::get_instance($mod, $this->userid);
-            $activitydates = \core\activity_dates::get_dates_for_module($mod, $this->userid);
+            $cm = $mod;
+            $completiondetails = \core_completion\cm_completion_details::get_instance($cm, $USER->id);
+            $activitydates = \core\activity_dates::get_dates_for_module($cm, $USER->id);
             $modicons .= $this->output->activity_information($mod, $completiondetails, $activitydates);
         } else {
             $modicons .= $this->course_section_cm_completion($course, $completioninfo, $mod, $displayoptions);
